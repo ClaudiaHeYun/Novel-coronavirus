@@ -1,13 +1,13 @@
 import sqlite3
 import csv
 
-cities_csv = open("./city-populations.csv")
+cities_csv = open("./city-populations.csv", encoding = "ISO-8859-1")
 city_reader = csv.DictReader(cities_csv)
 
-# with open("PEP_2018_PEPANNRSIP.US12A.csv") as states_csv:
-#     state_reader = csv.DictReader(cities_csv)
+states_csv = open("./state-populations.csv", encoding = "us-ascii")
+state_reader = csv.DictReader(states_csv)
 
-countries_csv = open("./country-populations.csv")
+countries_csv = open("./country-populations.csv", encoding="us-ascii")
 country_reader = csv.DictReader(countries_csv)
 
 # Create connection to database
@@ -32,7 +32,8 @@ c.execute('''CREATE TABLE cities(
 
 c.execute('''CREATE TABLE states(
     name TEXT NOT NULL, 
-    population INTEGER NOT NULL, 
+    country TEXT NOT NULL,
+    population INTEGER NOT NULL,
     PRIMARY KEY (name)
 )''')
 
@@ -53,6 +54,12 @@ conn.commit()
 for row in city_reader:
     c.execute("INSERT INTO cities (name, state, population) VALUES (?, ?, ?)", (
         row["NAME"], row["STNAME"], row["POPESTIMATE2018"]))
+
+for row in state_reader:
+    c.execute("INSERT INTO states VALUES (?, ?, ?)", (
+        row["NAME"],
+        "United States of America", 
+        row["POPESTIMATE2018"]))
 
 for row in country_reader:
     c.execute("INSERT INTO countries VALUES (?, ?, ?, ?, ?)", (
