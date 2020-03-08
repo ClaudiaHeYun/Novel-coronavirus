@@ -60,7 +60,7 @@ for row in country_reader:
         row["Year"], 
         row["Population"], 
         row["Area (sq. km.)"], 
-        row["Density (persons per sq. km.)"))
+        row["Density (persons per sq. km.)"]))
 
 conn.commit()
 conn.close()
