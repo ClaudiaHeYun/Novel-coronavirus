@@ -16,7 +16,6 @@ library(readxl)
 library(tidyr)
 library(sjmisc)
 
-
 ### SET WORKING DIRECTORY
 
 ### will update later, just don't want to accidentally delete something
@@ -24,25 +23,50 @@ setwd("C:/Users/zevan/Documents/Classes/Data Science/coronavirus") #for use on m
 #not sure how this works in github
 
 ###Reading in Databases
-original = read.csv("rawInfections.csv")
-locations = as.character(original[[1]])
+original = read.csv("raw_infections.csv")
+sliced = original[-c(14, 57, 70, 220:225), -c(3, 7, 8)]
+locations = as.character(sliced[[1]])
 for (i in (1:(length(locations))))
 {
   if (str_contains(locations[[i]], ',')) {
     result = strsplit(locations[[i]], ', ')
     locations[i] = result[[1]][[2]]
-#    locations[i] = result[2]
   }
 }
-data = original
+data = sliced
 data[1] = locations
 
-### cleaning bits
-#original <- original[, -c(2:6)]
-#original <- original %>%
-#  rename(
-#    ID = subDirectory_filePath
-#  )
+dat = unite(data, comb_place, c(Province.State, Country.Region), sep = "/")
+
+k = length(dat[,1])
+h = k
+for (i in (1:k)) {
+  for (j in (1:k)) {
+    if (i < h && j < h) {
+      if ((dat[i, 1] == dat[j, 1]) && (i != j)){
+        dat[i, 3] = dat[i, 3] + dat[j, 3]
+        dat[i, 4] = dat[i, 4] + dat[j, 4]
+        dat[i, 2] = dat[i, 2] + dat[j, 2]
+        dat = dat[-j, ]
+        h = h-1
+      }
+    }
+  }
+}
+
+state = as.character(dat[[1]])
+country = as.character(dat[[1]])
+for (i in (1:(length(state))))
+{
+  result = strsplit(state[[i]], '/')
+  state[i] = result[[1]][[1]]
+  country[i] = result[[1]][[2]]
+}
 
 
-write.csv(data, file = "cleanedData.csv")
+collapsed = dat
+collapsed$state = state
+collapsed$country = country
+collapsed = collapsed[-1]
+
+write.csv(collapsed, file = "cleaned_infections.csv")
