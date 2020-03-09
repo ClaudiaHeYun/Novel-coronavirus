@@ -1,0 +1,217 @@
+"","Province.State","Country.Region","Confirmed","Deaths","Recovered"
+"1","Hubei","Mainland China",67666,2959,43500
+"2","","South Korea",7041,44,135
+"3","","Italy",5883,233,589
+"4","","Iran",5823,145,1669
+"5","Guangdong","Mainland China",1352,7,1237
+"6","Henan","Mainland China",1272,22,1244
+"7","Zhejiang","Mainland China",1215,1,1154
+"8","Hunan","Mainland China",1018,4,960
+"9","Anhui","Mainland China",990,6,979
+"10","","France",949,11,12
+"11","Jiangxi","Mainland China",935,1,916
+"12","","Germany",799,0,18
+"13","Shandong","Mainland China",758,6,627
+"15","Jiangsu","Mainland China",631,0,606
+"16","Chongqing","Mainland China",576,6,526
+"17","Sichuan","Mainland China",539,3,454
+"18","","Spain",500,10,30
+"19","Heilongjiang","Mainland China",481,13,403
+"20","","Japan",461,6,76
+"21","Beijing","Mainland China",426,8,303
+"22","Shanghai","Mainland China",342,3,313
+"23","Hebei","Mainland China",318,6,307
+"24","Fujian","Mainland China",296,1,295
+"25","","Switzerland",268,1,3
+"26","Guangxi","Mainland China",252,2,218
+"27","Shaanxi","Mainland China",245,1,226
+"28","","UK",206,2,18
+"29","","Netherlands",188,1,0
+"30","Yunnan","Mainland China",174,2,170
+"31","","Belgium",169,0,1
+"32","Hainan","Mainland China",168,6,158
+"33","","Sweden",161,0,0
+"34","","Norway",147,0,0
+"35","Guizhou","Mainland China",146,2,115
+"36","","Singapore",138,0,78
+"37","Tianjin","Mainland China",136,3,128
+"38","Shanxi","Mainland China",133,0,126
+"39","Liaoning","Mainland China",125,1,107
+"40","Gansu","Mainland China",120,2,87
+"41","Hong Kong","Hong Kong",108,2,51
+"42","Jilin","Mainland China",93,1,90
+"43","","Malaysia",93,0,23
+"44","","Bahrain",85,0,4
+"45","","Austria",79,0,0
+"46","Xinjiang","Mainland China",76,3,72
+"47","Inner Mongolia","Mainland China",75,1,67
+"48","Ningxia","Mainland China",75,0,71
+"49","WA","US",71,15,1
+"50","","Kuwait",61,0,0
+"51","NY","US",57,0,0
+"52","","Iraq",54,4,0
+"53","","Iceland",50,0,0
+"54","","Thailand",50,1,31
+"55","","Greece",46,0,0
+"56","Taiwan","Taiwan",45,1,12
+"58","","United Arab Emirates",45,0,7
+"59","","India",34,0,3
+"60","CA","US",32,0,1
+"61","New South Wales","Australia",28,1,4
+"62","ON","Canada",27,0,3
+"63","WA","US",27,1,0
+"64","","Denmark",23,0,1
+"65","","San Marino",23,1,0
+"66","","Lebanon",22,0,1
+"67","","Palestine",22,0,0
+"68","British Columbia","Canada",21,0,4
+"69","","Israel",21,0,2
+"71","","Portugal",20,0,0
+"72","","Czech Republic",19,0,0
+"73","","Ireland",18,0,0
+"74","Qinghai","Mainland China",18,0,18
+"75","","Vietnam",18,0,16
+"76","","Algeria",17,0,0
+"77","","Oman",16,0,2
+"78","","Egypt",15,0,1
+"79","","Finland",15,0,1
+"80","CA","US",14,0,0
+"81","Queensland","Australia",13,0,8
+"82","","Brazil",13,0,0
+"83","","Ecuador",13,0,0
+"84","","Russia",13,0,2
+"85","","Croatia",12,0,0
+"86","Victoria","Australia",11,0,7
+"87","NY","US",11,0,0
+"88","","Estonia",10,0,0
+"89","Macau","Macau",10,0,10
+"90","","Azerbaijan",9,0,0
+"91","","Romania",9,0,3
+"92","CA","US",9,0,0
+"93","","Argentina",8,0,0
+"94","","Qatar",8,0,0
+"95","South Australia","Australia",7,0,2
+"96","","Slovenia",7,0,0
+"97","","Belarus",6,0,0
+"98","","Mexico",6,0,1
+"99","","Pakistan",6,0,0
+"100","","Philippines",6,1,1
+"101","IL","US",6,0,2
+"102","","French Guiana",5,0,0
+"103","","New Zealand",5,0,0
+"104","","Poland",5,0,0
+"105","","Saudi Arabia",5,0,0
+"106","TX","US",5,0,0
+"107","CA","US",5,1,0
+"108","WA","US",5,0,0
+"109","","Chile",4,0,0
+"110","","Georgia",4,0,0
+"111","","Hungary",4,0,0
+"112","","Indonesia",4,0,0
+"113","","Senegal",4,0,0
+"114","NJ","US",4,0,0
+"115","NY","US",4,0,0
+"116","Western Australia","Australia",3,1,0
+"117","","Bosnia and Herzegovina",3,0,0
+"118","QC","Canada",3,0,0
+"119","","Malta",3,0,0
+"120","","North Macedonia",3,0,0
+"121","","Saint Barthelemy",3,0,0
+"122","CA","US",3,0,0
+"123","CO","US",3,0,0
+"124","TX","US",3,0,0
+"125","GA","US",3,0,0
+"126","AZ","US",3,0,1
+"127","MD","US",3,0,0
+"128","CA","US",3,0,0
+"129","RI","US",3,0,0
+"130","CA","US",3,0,1
+"131","MA","US",3,0,1
+"132","OR","US",3,0,0
+"133","","Dominican Republic",2,0,0
+"134","","Luxembourg",2,0,0
+"135","","Martinique",2,0,0
+"136","","Morocco",2,0,0
+"137","MA","US",2,0,0
+"138","CA","US",2,0,0
+"139","FL","US",2,0,0
+"140","CO","US",2,0,0
+"141","CT","US",2,0,0
+"142","GA","US",2,0,0
+"143","NH","US",2,0,0
+"144","FL","US",2,0,0
+"145","FL","US",2,0,0
+"146","AZ","US",2,0,0
+"147","NY","US",2,0,0
+"148","CA","US",2,0,0
+"149","CA","US",2,0,0
+"150","CA","US",2,0,0
+"151","NY","US",2,0,0
+"152","CO","US",2,0,0
+"153","","Afghanistan",1,0,0
+"154","","Andorra",1,0,0
+"155","","Armenia",1,0,0
+"156","Tasmania","Australia",1,0,0
+"157","","Bhutan",1,0,0
+"158","","Cambodia",1,0,1
+"159","","Cameroon",1,0,0
+"160","Alberta","Canada",1,0,0
+"161","Alberta","Canada",1,0,0
+"162","ON","Canada",1,0,1
+"163","","Colombia",1,0,0
+"164","","Costa Rica",1,0,0
+"165","","Faroe Islands",1,0,0
+"166","","Gibraltar",1,0,0
+"167","","Jordan",1,0,0
+"168","","Latvia",1,0,0
+"169","","Liechtenstein",1,0,0
+"170","","Lithuania",1,0,0
+"171","Tibet","Mainland China",1,0,1
+"172","","Monaco",1,0,0
+"173","","Nepal",1,0,1
+"174","","Nigeria",1,0,0
+"175","","Peru",1,0,0
+"176","","Serbia",1,0,0
+"177","","Slovakia",1,0,0
+"178","","South Africa",1,0,0
+"179","","Sri Lanka",1,0,1
+"180","","Togo",1,0,0
+"181","","Tunisia",1,0,0
+"182","SC","US",1,0,0
+"183","NC","US",1,0,0
+"184","NV","US",1,0,0
+"185","WA","US",1,0,0
+"186","GA","US",1,0,0
+"187","UT","US",1,0,0
+"188","PA","US",1,0,0
+"189","NE","US",1,0,0
+"190","CO","US",1,0,0
+"191","KY","US",1,0,0
+"192","WA","US",1,0,0
+"193","HI","US",1,0,0
+"194","CA","US",1,0,0
+"195","OR ","US",1,0,0
+"196","WA","US",1,0,0
+"197","SC","US",1,0,0
+"198","OR","US",1,0,0
+"199","CA","US",1,0,0
+"200","WI","US",1,0,1
+"201","IN","US",1,0,0
+"202","MA","US",1,0,0
+"203","WA","US",1,0,0
+"204","MA","US",1,0,0
+"205","MN","US",1,0,0
+"206","TX","US",1,0,0
+"207","CA","US",1,0,0
+"208","FL","US",1,0,0
+"209","FL","US",1,0,0
+"210","CA","US",1,0,0
+"211","OK","US",1,0,0
+"212","OR","US",1,0,0
+"213","NC","US",1,0,0
+"214","NV","US",1,0,0
+"215","PA","US",1,0,0
+"216","TN","US",1,0,0
+"217","CA","US",1,0,0
+"218","","Ukraine",1,0,0
+"219","","Vatican City",1,0,0
