@@ -78,7 +78,7 @@ c.execute('''CREATE TABLE cases(
     state TEXT,
     country TEXT,
     confirmed INTEGER,
-    died INTEGER,
+    deaths INTEGER,
     recovered INTEGER
 )''')
 
