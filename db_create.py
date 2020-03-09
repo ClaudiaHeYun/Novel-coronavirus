@@ -21,7 +21,7 @@ australia_reader = csv.DictReader(australia_csv)
 china_csv = open(f"{DATA_PATH}/population/china-populations-2018.csv")
 china_reader = csv.DictReader(china_csv)
 
-case_reports_csv = open(f"{DATA_PATH}/virus/interim_infections.csv")
+case_reports_csv = open(f"{DATA_PATH}/virus/cleaned_infections.csv")
 cases_reader = csv.DictReader(case_reports_csv)
 
 airports_csv = open(f"{DATA_PATH}/flights/airports.csv")
@@ -140,12 +140,12 @@ for row in country_reader:
 
 # TODO clean up US and UK names in order to join by foreign key
 for row in cases_reader:
-    c.execute("INSERT INTO cases (state, country, confirmed, died, recovered) VALUES (?, ?, ?, ?, ?)", (
-        row["Province.State"], 
-        row["Country.Region"], 
-        row["Confirmed"], 
-        row["Deaths"],
-        row["Recovered"]))
+    c.execute("INSERT INTO cases (state, country, confirmed, deaths, recovered) VALUES (?, ?, ?, ?, ?)", (
+        row["state"], 
+        row["country"], 
+        row["confirmed"], 
+        row["deaths"],
+        row["recovered"]))
 
 for row in airports_reader:
     c.execute("INSERT INTO airports VALUES (?, ?, ?, ?, ?, ?)", (
