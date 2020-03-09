@@ -21,8 +21,14 @@ australia_reader = csv.DictReader(australia_csv)
 china_csv = open(f"{DATA_PATH}/population/china-populations-2018.csv")
 china_reader = csv.DictReader(china_csv)
 
-case_reports_csv = open(f"{DATA_PATH}/virus/cleanedInfections.csv")
+case_reports_csv = open(f"{DATA_PATH}/virus/interim_infections.csv")
 cases_reader = csv.DictReader(case_reports_csv)
+
+airports_csv = open(f"{DATA_PATH}/flights/airports.csv")
+airports_reader = csv.DictReader(airports_csv)
+
+routes_csv = open(f"{DATA_PATH}/flights/routes.csv")
+routes_reader = csv.DictReader(routes_csv)
 
 # Create connection to database
 conn = sqlite3.connect('data.db')
@@ -32,6 +38,9 @@ c = conn.cursor()
 c.execute('DROP TABLE IF EXISTS "cities";')
 c.execute('DROP TABLE IF EXISTS "states";')
 c.execute('DROP TABLE IF EXISTS "countries";')
+c.execute('DROP TABLE IF EXISTS "cases";')
+c.execute('DROP TABLE IF EXISTS "airports";')
+c.execute('DROP TABLE IF EXISTS "routes";')
 
 #TODO: Create tables in the database and add data to it. REMEMBER TO COMMIT
 
@@ -66,15 +75,28 @@ c.execute('''CREATE TABLE countries(
 
 c.execute('''CREATE TABLE cases(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    timestamp INTEGER,
     state TEXT,
     country TEXT,
     confirmed INTEGER,
     died INTEGER,
-    recovered INTEGER,
-    latitude REAL,
-    longitude REAL,
-    PRIMARY KEY (name)
+    recovered INTEGER
+)''')
+
+c.execute('''CREATE TABLE airports(
+    airport_id INTEGER PRIMARY KEY,
+    name TEXT,
+    city TEXT NOT NULL,
+    country TEXT NOT NULL,
+    iata TEXT NOT NULL,
+    icao TEXT
+)''')
+
+c.execute('''CREATE TABLE routes(
+    route_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    departure_iata TEXT,
+    arrival_iata TEXT,
+    FOREIGN KEY (departure_iata) REFERENCES airports(iata),
+    FOREIGN KEY (arrival_iata) REFERENCES airports(iata)
 )''')
 
 conn.commit()
@@ -118,15 +140,26 @@ for row in country_reader:
 
 # TODO clean up US and UK names in order to join by foreign key
 for row in cases_reader:
-    c.execute("INSERT INTO cases (timestamp, state, country, confirmed, died, recovered, latitude, longitude) VALUES (?, ?, ?, ?, ?)", (
-        row["Last.Update"], 
+    c.execute("INSERT INTO cases (state, country, confirmed, died, recovered) VALUES (?, ?, ?, ?, ?)", (
         row["Province.State"], 
         row["Country.Region"], 
         row["Confirmed"], 
         row["Deaths"],
-        row["Recovered"],
-        row["Latitude"],
-        row["longitude"]))
+        row["Recovered"]))
+
+for row in airports_reader:
+    c.execute("INSERT INTO airports VALUES (?, ?, ?, ?, ?, ?)", (
+        row["AIRPORT_ID"],
+        row["NAME"],
+        row["CITY"],
+        row["COUNTRY"],
+        row["IATA"],
+        row["ICAO"]))
+
+for row in airports_reader:
+    c.execute("INSERT INTO routes (departure_iata, arrival_iata) VALUES (?, ?)", (
+        row["DEP_ID"],
+        row["ARR_ID"]))
 
 conn.commit()
 conn.close()
