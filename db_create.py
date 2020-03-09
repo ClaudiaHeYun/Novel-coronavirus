@@ -6,11 +6,11 @@ DATA_PATH = "data"
 cities_csv = open(f"{DATA_PATH}/population/us-cities-populations.csv", encoding = "ISO-8859-1")
 city_reader = csv.DictReader(cities_csv)
 
-states_csv = open(f"{DATA_PATH}/population/us-states-populations.csv", encoding = "us-ascii")
-state_reader = csv.DictReader(states_csv)
-
-countries_csv = open(f"{DATA_PATH}/population/country-populations.csv", encoding="us-ascii")
+countries_csv = open(f"{DATA_PATH}/population/country-populations-2018.csv", encoding="us-ascii")
 country_reader = csv.DictReader(countries_csv)
+
+states_csv = open(f"{DATA_PATH}/population/us-states-populations-2018.csv", encoding = "us-ascii")
+us_state_reader = csv.DictReader(states_csv)
 
 canada_csv = open(f"{DATA_PATH}/population/canada-provinces-2016.csv")
 canada_reader = csv.DictReader(canada_csv)
@@ -35,14 +35,15 @@ c.execute('DROP TABLE IF EXISTS "countries";')
 # Useful column names: NAME,STNAME,POPESTIMATE2018
 c.execute('''CREATE TABLE cities(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL, 
+    name TEXT NOT NULL,
     state TEXT NOT NULL, 
     population INTEGER NOT NULL,
     FOREIGN KEY (state) REFERENCES states(name)
 )''')
 
 c.execute('''CREATE TABLE states(
-    name TEXT NOT NULL, 
+    name TEXT NOT NULL,
+    abbreviation TEXT,
     country TEXT NOT NULL,
     population INTEGER NOT NULL,
     PRIMARY KEY (name)
@@ -66,26 +67,27 @@ for row in city_reader:
     c.execute("INSERT INTO cities (name, state, population) VALUES (?, ?, ?)", (
         row["NAME"], row["STNAME"], row["POPESTIMATE2018"]))
 
-for row in state_reader:
-    c.execute("INSERT INTO states VALUES (?, ?, ?)", (
+for row in us_state_reader:
+    c.execute("INSERT INTO states (name, abbreviation, country, population) VALUES (?, ?, ?, ?)", (
         row["NAME"],
+        row["ABBREV"],
         "United States of America", 
         row["POPESTIMATE2018"]))
 
 for row in canada_reader:
-    c.execute("INSERT INTO states VALUES (?, ?, ?)", (
+    c.execute("INSERT INTO states (name, country, population) VALUES (?, ?, ?)", (
         row["Geographic name"],
         "Canada", 
         row["Population, 2016"]))
 
 for row in australia_reader:
-    c.execute("INSERT INTO states VALUES (?, ?, ?)", (
+    c.execute("INSERT INTO states (name, country, population) VALUES (?, ?, ?)", (
         row["State"],
         "Australia", 
         row["Population"]))
 
 for row in china_reader:
-    c.execute("INSERT INTO states VALUES (?, ?, ?)", (
+    c.execute("INSERT INTO states (name, country, population) VALUES (?, ?, ?)", (
         row["Region"],
         "China", 
         row["Population"]))
