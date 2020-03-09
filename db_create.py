@@ -21,6 +21,9 @@ australia_reader = csv.DictReader(australia_csv)
 china_csv = open(f"{DATA_PATH}/population/china-populations-2018.csv")
 china_reader = csv.DictReader(china_csv)
 
+case_reports_csv = open(f"{DATA_PATH}/virus/cleanedInfections.csv")
+cases_reader = csv.DictReader(case_reports_csv)
+
 # Create connection to database
 conn = sqlite3.connect('data.db')
 c = conn.cursor()
@@ -58,6 +61,19 @@ c.execute('''CREATE TABLE countries(
     population INTEGER NOT NULL,
     area REAL NOT NULL,
     density REAL NOT NULL,
+    PRIMARY KEY (name)
+)''')
+
+c.execute('''CREATE TABLE cases(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp INTEGER,
+    state TEXT,
+    country TEXT,
+    confirmed INTEGER,
+    died INTEGER,
+    recovered INTEGER,
+    latitude REAL,
+    longitude REAL,
     PRIMARY KEY (name)
 )''')
 
@@ -99,6 +115,18 @@ for row in country_reader:
         row["Population"], 
         row["Area (sq. km.)"], 
         row["Density (persons per sq. km.)"]))
+
+# TODO clean up US and UK names in order to join by foreign key
+for row in cases_reader:
+    c.execute("INSERT INTO cases (timestamp, state, country, confirmed, died, recovered, latitude, longitude) VALUES (?, ?, ?, ?, ?)", (
+        row["Last.Update"], 
+        row["Province.State"], 
+        row["Country.Region"], 
+        row["Confirmed"], 
+        row["Deaths"],
+        row["Recovered"],
+        row["Latitude"],
+        row["longitude"]))
 
 conn.commit()
 conn.close()

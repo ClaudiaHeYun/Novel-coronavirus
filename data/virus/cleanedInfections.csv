@@ -1,4 +1,4 @@
-"","Province.State","Country.Region","Last.Update","Confirmed","Deaths","Recovered","Latitude","Longitude"
+"id","Province.State","Country.Region","Last.Update","Confirmed","Deaths","Recovered","Latitude","Longitude"
 "1","Hubei","Mainland China","2020-03-07T11:13:04",67666,2959,43500,30.9756,112.2707
 "2","","South Korea","2020-03-07T10:13:22",7041,44,135,36,128
 "3","","Italy","2020-03-07T17:33:03",5883,233,589,43,12
