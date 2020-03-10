@@ -88,13 +88,13 @@ c.execute('''CREATE TABLE airports(
     city TEXT NOT NULL,
     country TEXT NOT NULL,
     iata TEXT NOT NULL,
-    icao TEXT
+    icao TEXT NOT NULL
 )''')
 
 c.execute('''CREATE TABLE routes(
     route_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    departure_iata TEXT,
-    arrival_iata TEXT,
+    departure_code TEXT,
+    arrival_code TEXT,
     FOREIGN KEY (departure_iata) REFERENCES airports(iata),
     FOREIGN KEY (arrival_iata) REFERENCES airports(iata)
 )''')
@@ -157,7 +157,7 @@ for row in airports_reader:
         row["ICAO"]))
 
 for row in airports_reader:
-    c.execute("INSERT INTO routes (departure_iata, arrival_iata) VALUES (?, ?)", (
+    c.execute("INSERT INTO routes (departure_code, arrival_code) VALUES (?, ?)", (
         row["DEP_ID"],
         row["ARR_ID"]))
 
