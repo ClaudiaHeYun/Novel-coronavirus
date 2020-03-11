@@ -8,7 +8,7 @@ Use flight route traffic to establish a measure of connectedness between cities 
 
 If you aren't familiar with Markdown here's some info:
 
-- [Markdown cheatsheet](https://github.com/adam-p/markdown-here/wiki)Markdown-Cheatsheet]
+- [Markdown cheatsheet](https://github.com/adam-p/markdown-here/wiki)
 - [Basic syntax](https://www.markdownguide.org/basic-syntax/)
 
 ## Data Spec
