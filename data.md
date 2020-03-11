@@ -120,8 +120,6 @@ Luckily since this data is one of the top-line number for census bureaus worldwi
 
 How clean is the data? Does this data contain what you need in order to complete the project you proposed to do? (Each team will have to go about answering this question differently, but use the following questions as a guide. Graphs and tables are highly encouraged if they allow you to answer these questions more succinctly.)
 
-### Challenges
-
 
 ### Next Steps
 
