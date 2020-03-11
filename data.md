@@ -4,13 +4,6 @@
 
 Use flight route traffic to establish a measure of connectedness between cities interationally. With this connectedness measure and case numbers, predict the spread in case/10,000 of CoVID-19 globally. In certain regions where intranational data is available, we plan to predict spread between states/provinces/territories.
 
-### How to edit this doc
-
-If you aren't familiar with Markdown here's some info:
-
-- [Markdown cheatsheet](https://github.com/adam-p/markdown-here/wiki)
-- [Basic syntax](https://www.markdownguide.org/basic-syntax/)
-
 ## Data Spec
 
 Data for this project was pulled from a number of different sources so rather than describe the source CSV’s this data specification describes the data created from all of the different sources. Within the `data` folder there are three subfolders, `flights`, `population`, and `virus`. The flights folder uses data pulled from OpenFlights, the population folder has csv files pulled from the US, Canadian, Australian, and Chinese census bureaus’ websites and is pulled from the latest available year which was 2018, with the exception of Canada for which the latest available year was 2016.
