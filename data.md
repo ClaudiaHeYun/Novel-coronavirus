@@ -77,8 +77,92 @@ virus has case report data.
 
 A sample of your data (e.g. 10 - 100 rows) that we can easily open and view on our computers.
 
+Flights:
+```
+1|Alabama|Alabama|4887871
+2|Abbeville city|Alabama|2563
+3|Adamsville city|Alabama|4325
+4|Addison town|Alabama|724
+5|Akron town|Alabama|330
+6|Alabaster city|Alabama|33340
+7|Albertville city|Alabama|21568
+8|Alexander City city|Alabama|14467
+9|Aliceville city|Alabama|2301
+10|Allgood town|Alabama|622
+```
+
+States:
+```
+United States|AK|United States of America|326687501
+Northeast Region|AL|United States of America|56046620
+Midwest Region|AR|United States of America|68236628
+South Region|AZ|United States of America|124569433
+West Region|CA|United States of America|77834820
+Alabama|CO|United States of America|4887681
+Alaska|CT|United States of America|735139
+Arizona|DE|United States of America|7158024
+Arkansas|DC|United States of America|3009733
+California|FL|United States of America|39461588
+```
+
+Countries:
+```
+Afghanistan|2020|36643815|652230.0|56.2
+Albania|2020|3074579|27398.0|112.2
+Algeria|2020|42972878|2381740.0|18.0
+American Samoa|2020|49437|198.0|250.0
+Andorra|2020|85635|468.0|183.0
+Angola|2020|32522339|1246700.0|26.1
+Anguilla|2020|18090|91.0|198.8
+Antigua and Barbuda|2020|98179|443.0|221.8
+Argentina|2020|45479118|2736690.0|16.6
+Armenia|2020|3021324|28203.0|107.1
+```
+
+Cases:
+```
+1|Hubei|Mainland China|67666|2959|43500
+2||South Korea|7041|44|135
+3||Italy|5883|233|589
+4||Iran|5823|145|1669
+5|Guangdong|Mainland China|1352|7|1237
+6|Henan|Mainland China|1272|22|1244
+7|Zhejiang|Mainland China|1215|1|1154
+8|Hunan|Mainland China|1018|4|960
+9|Anhui|Mainland China|990|6|979
+10||France|949|11|12
+```
+
+Airports:
+```
+1|Goroka Airport|Goroka|Papua New Guinea|GKA|AYGA
+2|Madang Airport|Madang|Papua New Guinea|MAG|AYMD
+3|Mount Hagen Kagamuga Airport|Mount Hagen|Papua New Guinea|HGU|AYMH
+4|Nadzab Airport|Nadzab|Papua New Guinea|LAE|AYNZ
+5|Port Moresby Jacksons International Airport|Port Moresby|Papua New Guinea|POM|AYPY
+6|Wewak International Airport|Wewak|Papua New Guinea|WWK|AYWK
+7|Narsarsuaq Airport|Narssarssuaq|Greenland|UAK|BGBW
+8|Godthaab / Nuuk Airport|Godthaab|Greenland|GOH|BGGH
+9|Kangerlussuaq Airport|Sondrestrom|Greenland|SFJ|BGSF
+10|Thule Air Base|Thule|Greenland|THU|BGTL
+```
+
+Routes:
+```
+1|AER|KZN
+2|ASF|KZN
+3|ASF|MRV
+4|CEK|KZN
+5|CEK|OVB
+6|DME|KZN
+7|DME|NBC
+8|DME|TGK
+9|DME|UUA
+10|EGO|KGD
+```
+
 ## Tech Report
- 
+
 ### Data Collection
 
 #### Cases
@@ -93,9 +177,7 @@ This flight data is from openflights.org. The two data files were in the form of
 
 #### Population
 
-This data was pulled from the Canadian, Australian, 
-
-### Source Reputations
+This data was pulled from the Canadian, Australian, US, and Chinese census bureaus. Since this is a crucial government metric, we can be reasonably confident about the veracity and cleanliness of the data, although you never know.
 
 ### Data Cleanliness
 
