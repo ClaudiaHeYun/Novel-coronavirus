@@ -16,8 +16,6 @@ with open("./routes.csv") as routes_csv, open("./route_traffic.csv", "w") as tra
 	cnt = 0
 	for route in routes_reader:
 		# REQUESTS COST MONEY!
-		route_string = route["Route by code"]
-		(departure_code, arrivale_code) = route_string.split("-")
 		departure_code = "KSFO" #route["DEP"]
 		arrival_code = "KJFK" # route["ARR"]
 		(year, month, day) = ("2020", "3", "12")
