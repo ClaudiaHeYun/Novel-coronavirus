@@ -7,7 +7,7 @@ appId = "f095c287"
 appKey = ""
 
 # For each route in the routes CSV request flight data on our chosen analysis date=
-with open("./top-100-routes.csv") as routes_csv, open("./route_traffic.csv", "w") as traffic_csv:
+with open("./routes.csv") as routes_csv, open("./route_traffic.csv", "w") as traffic_csv:
 	routes_reader = csv.DictReader(routes_csv)
 	traffic_writer = csv.writer(traffic_csv)
 	traffic_writer.writerow(["departure code", "arrival code", "scheduled flights", "number of flights"])
