@@ -1,0 +1,101 @@
+ID,Route by city,Route by code,Passengers - 2017
+1,Jeju - Seoul Gimpo,CJU-GMP,13460306
+2,Melbourne - Sydney Kingsford Smith,MEL-SYD,9090941
+3,Sapporo - Tokyo Haneda,CTS-HND,8726502
+4,Fukuoka - Tokyo Haneda,FUK-HND,7864000
+5,Mumbai - Delhi Indira Gandhi,BOM-DEL,7129943
+6,Beijing Capital - Shanghai Hongqiao,PEK-SHA,6833684
+7,Hanoi - Tan Son Nhat Ho Chi Minh City,HAN-SGN,6769823
+8,Hong Kong - Taiwan Taoyuan,HKG-TPE,6719030
+9,Jakarta - Juanda Surabaya,CGK-SUB,5271304
+10,Tokyo Haneda - Okinawa,HND-OKA,5269481
+11,Tokyo Haneda - Osaka International,HND-ITM,5106584
+12,Jeddah - Riyadh King Kalid,JED-RUH,5091629
+13,Jakarta - Denpasar,CGK-DPS,4952852
+14,Chengdu - Beijing Capital,CTU-PEK,4951620
+15,Guangzhou - Beijing Capital,CAN-PEK,4864177
+16,Jakarta - Singapore Changi,CGK-SIN,4810602
+17,Brisbane - Sydney Kingsford Smith,BNE-SYD,4742771
+18,Cape Town - O.r. Tambo Johannesburg,CPT-JNB,4698849
+19,Cancun - Mexico City,CUN-MEX,4656308
+20,Jakarta - Ujung Pandang,CGK-UPG,4559737
+21,Beijing Capital - Shenzhen Bao'an,PEK-SZX,4496351
+22,Guangzhou - Shanghai Hongqiao,CAN-SHA,4469990
+23,Shanghai Hongqiao - Shenzhen Bao'an,SHA-SZX,4445654
+24,Bangalore - Delhi Indira Gandhi,BLR-DEL,4183799
+25,Hong Kong - Shanghai Pudong,HKG-PVG,4162347
+26,Kuala Lumpur - Singapore Changi,KUL-SIN,4108824
+27,Sao Paulo Congonhas - Santos Dumont Rio De Janeiro,CGH-SDU,4096193
+28,Jakarta - Kualanamu,CGK-KNO,3886963
+29,Brisbane - Melbourne,BNE-MEL,3545156
+30,New York Jfk - Los Angeles,JFK-LAX,3531613
+31,Los Angeles - San Francisco,LAX-SFO,3507702
+32,Izmir - Istanbul Ataturk,ADB-IST,3496438
+33,Bangalore - Mumbai,BLR-BOM,3445315
+34,Bangkok Suvarnabhumi - Hong Kong,BKK-HKG,3438628
+35,Bangkok Suvarnabhumi - Phuket,BKK-HKT,3396189
+36,Bangkok Don Mueang - Phuket,DMK-HKT,3325261
+37,Bogota - Medellin,BOG-MDE,3323127
+38,Mactan-Cebu - Manila Ninoy Aquino,CEB-MNL,3233871
+39,Da Nang - Tan Son Nhat Ho Chi Minh City,DAD-SGN,3210368
+40,Dubai - London Heathrow,DXB-LHR,3210121
+41,Mexico City - Monterrey,MEX-MTY,3202091
+42,Hong Kong - Seoul Incheon,HKG-ICN,3198132
+43,Chiang Mai - Bangkok Don Mueang,CNX-DMK,3155528
+44,Kolkata - Delhi Indira Gandhi,CCU-DEL,3153548
+45,Hong Kong - Singapore Changi,HKG-SIN,3147384
+46,New York Laguardia - Chicago O'hare,LGA-ORD,3118651
+47,Cuzco - Lima Jorge Chavez,CUZ-LIM,3000513
+48,Guadalajara - Mexico City,GDL-MEX,2996806
+49,New York Jfk - London Heathrow,JFK-LHR,2972817
+50,Hong Kong - Beijing Capital,HKG-PEK,2962707
+51,Vancouver - Toronto Lester B. Pearson,YVR-YYZ,2950823
+52,Guangzhou - Chengdu,CAN-CTU,2944642
+53,Los Angeles Mccarran - Chicago O'hare,LAX-ORD,2927492
+54,Hong Kong - Manila Ninoy Aquino,HKG-MNL,2907228
+55,Seoul Incheon - Kansai International,ICN-KIX,2907199
+56,Hangzhou - Beijing Capital,HGH-PEK,2883519
+57,Durban - O.r. Tambo Johannesburg,DUR-JNB,2847156
+58,Atlanta Hartsfield-Jackson - Orlando,ATL-MCO,2836474
+59,Las Vegas - Los Angeles Mccarran,LAS-LAX,2823411
+60,Jakarta - Kuala Lumpur,CGK-KUL,2812479
+61,Jeju - Gimhae,CJU-PUS,2793383
+62,Los Angeles - Seattle-Tacoma,LAX-SEA,2768035
+63,Gold Coast - Sydney Kingsford Smith,OOL-SYD,2739057
+64,Bogota - Cali,BOG-CLO,2726627
+65,Guangzhou - Hangzhou Xiaoshan,CAN-HGH,2653701
+66,Montreal - Toronto Lester B. Pearson,YUL-YYZ,2640849
+67,Jinghong - Kunming Changshui,JHG-KMG,2627969
+68,Auckland - Wellington,AKL-WLG,2617041
+69,Kota Kinabalu - Kuala Lumpur,BKI-KUL,2609151
+70,Izmir - Sabiha Gokcen,ADB-SAW,2608469
+71,Davao - Manila Ninoy Aquino,DVO-MNL,2606945
+72,Delhi Indira Gandhi - Pune,DEL-PNQ,2601764
+73,Bangkok Suvarnabhumi - Singapore Changi,BKK-SIN,2596349
+74,Tokyo Narita - Taiwan Taoyuan I,NRT-TPE,2592049
+75,Delhi Indira Gandhi - Hyderabad,DEL-HYD,2577743
+76,Bogota - Cartagena,BOG-CTG,2573763
+77,Tokyo Haneda - Kagoshima,HND-KOJ,2553366
+78,Beijing Capital - Xi'an Xianyang,PEK-XIY,2540100
+79,Mumbai - Goa,BOM-GOI,2537413
+80,Auckland - Christchurch,AKL-CHC,2535669
+81,Da Nang - Hanoi,DAD-HAN,2534425
+82,Kansai International - Taiwan Taoyuan,KIX-TPE,2530208
+83,Denver - Los Angeles,DEN-LAX,2519541
+84,Bangkok Don Mueang - Hat Yai,DMK-HDY,2518553
+85,Chengdu - Shenzhen Bao'an,CTU-SZX,2509192
+86,Chongqing - Beijing Capital,CKG-PEK,2485613
+87,Guangzhou - Chongqing,CAN-CKG,2468368
+88,Delhi Indira Gandhi - Chennai,DEL-MAA,2456556
+89,Adelaide - Melbourne,ADL-MEL,2454637
+90,Surabaya - Makassar Sultan Hanuddin,SUB-UPG,2434487
+91,Bangkok Suvarnabhumi - Chiang Mai,BKK-CNX,2395389
+92,Dubai - Kuwait,DXB-KWI,2394192
+93,Atlanta Hartsfield-Jackson - New York Laguardia,ATL-LGA,2387693
+94,Mumbai - Dubai,BOM-DXB,2383145
+95,Kuala Lumpur - Penang,KUL-PEN,2379127
+96,Ankara - Sabiha Gokcen,ESB-SAW,2378692
+97,Mumbai - Chennai,BOM-MAA,2377806
+98,Atlanta Hartsfield-Jackson - Ft. Lauderdale,ATL-FLL,2360786
+99,Jakarta - Minangkabau,CGK-PDG,2350206
+100,Kuching - Kuala Lumpur,KCH-KUL,2341291
