@@ -30,6 +30,9 @@ airports_reader = csv.DictReader(airports_csv)
 routes_csv = open(f"{DATA_PATH}/flights/routes.csv")
 routes_reader = csv.DictReader(routes_csv)
 
+traffic_csv = open(f"{DATA_PATH}/flights/top-100-routes.csv")
+traffic_reader = csv.DictReader(traffic_csv)
+
 # Create connection to database
 conn = sqlite3.connect('data.db')
 c = conn.cursor()
@@ -41,6 +44,7 @@ c.execute('DROP TABLE IF EXISTS "countries";')
 c.execute('DROP TABLE IF EXISTS "cases";')
 c.execute('DROP TABLE IF EXISTS "airports";')
 c.execute('DROP TABLE IF EXISTS "routes";')
+c.execute('DROP TABLE IF EXISTS "traffic";')
 
 #TODO: Create tables in the database and add data to it. REMEMBER TO COMMIT
 
@@ -99,6 +103,16 @@ c.execute('''CREATE TABLE routes(
     FOREIGN KEY (arrival_code) REFERENCES airports(iata)
 )''')
 
+c.execute('''CREATE TABLE traffic (
+    route_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    departure_code TEXT,
+    arrival_code TEXT,
+    passengers INTEGER,
+    flights INTEGER,
+    FOREIGN KEY (departure_code) REFERENCES airports(iata),
+    FOREIGN KEY (arrival_code) REFERENCES airports(iata)
+)''')
+
 conn.commit()
 
 for row in city_reader:
@@ -148,6 +162,8 @@ for row in cases_reader:
         row["recovered"]))
 
 for row in airports_reader:
+    # NOTE: IATA codes has \N when no code is known. There 1626 such records
+    # NOTE: ICAO has one record with a \N
     c.execute("INSERT INTO airports VALUES (?, ?, ?, ?, ?, ?)", (
         row["AIRPORT_ID"],
         row["NAME"],
@@ -161,8 +177,22 @@ for row in routes_reader:
         row["DEP"],
         row["ARR"]))
 
+for row in traffic_reader:
+    (dep, arr) = row["Route by code"].split("-")
+    c.execute("INSERT INTO traffic (departure_code, arrival_code, passengers) VALUES (?, ?, ?)",(
+        dep,
+        arr,
+        row["Passengers - 2017"]
+    ))
+
 conn.commit()
 conn.close()
 
 cities_csv.close()
 countries_csv.close()
+states_csv.close()
+case_reports_csv.close()
+canada_csv.close()
+china_csv.close()
+routes_csv.close()
+traffic_csv.close()
