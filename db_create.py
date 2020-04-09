@@ -154,7 +154,7 @@ for row in country_reader:
 
 # TODO clean up US and UK names in order to join by foreign key
 for row in cases_reader:
-    c.execute("INSERT INTO cases (state, country, confirmed, deaths, recovered) VALUES (?, ?, ?, ?, ?)", (
+    c.execute("INSERT INTO cases (date, state, country, confirmed, deaths, recovered) VALUES (?, ?, ?, ?, ?, ?)", (
         row["state"], 
         row["country"], 
         row["confirmed"], 
