@@ -6,21 +6,31 @@
 -- on traffic.arrival_code == airports.iata
 -- group by country
 -- limit 10;
-
-select *,
-	(
-		select airports.country
-		from airports
-		where airports.iata = departure_code
-	) as departure_country,
-	(
-		select airports.country
-		from airports
-		where airports.iata = arrival_code
-	) as arrival_country
+select count(), sum(connections.passengers), connections.arrival_country, case_data.population, case_data.cases, case_data.date
 from (
-	select t.departure_code, t.arrival_code, t.passengers
-	from traffic as t
-	join airports as a
-	on a.iata = t.departure_code
-);
+	select *,
+		(
+			select airports.country
+			from airports
+			where airports.iata = departure_code
+		) as departure_country,
+		(
+			select airports.country
+			from airports
+			where airports.iata = arrival_code
+		) as arrival_country
+	from (
+		select t.departure_code, t.arrival_code, t.passengers
+		from traffic as t
+		join airports as a
+		on a.iata = t.departure_code
+	)
+ ) as connections
+join (
+	select ca.date, ca.country, ca.cases, co.population
+	from cases as ca
+	join countries as co
+	on ca.country = co.country
+) as case_data
+on case_data.arrival_country = connections.departure_country
+group by connections.arrival_country;
