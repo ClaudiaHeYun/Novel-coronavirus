@@ -1,5 +1,6 @@
 import sqlite3
 import csv
+import datetime
 
 DATA_PATH = "data"
 
@@ -79,6 +80,7 @@ c.execute('''CREATE TABLE countries(
 
 c.execute('''CREATE TABLE cases(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    date TEXT,
     state TEXT,
     country TEXT,
     confirmed INTEGER,
@@ -155,6 +157,7 @@ for row in country_reader:
 # TODO clean up US and UK names in order to join by foreign key
 for row in cases_reader:
     c.execute("INSERT INTO cases (date, state, country, confirmed, deaths, recovered) VALUES (?, ?, ?, ?, ?, ?)", (
+        str(datetime.datetime.now()),
         row["state"], 
         row["country"], 
         row["confirmed"], 
