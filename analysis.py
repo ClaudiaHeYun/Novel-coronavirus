@@ -11,22 +11,47 @@ import statsmodels.formula.api as smf
 conn = sqlite3.connect('data.db')
 c = conn.cursor()
 
-connectedness_query = ""
+connectedness_query = """
+select *,
+	(
+		select airports.country
+		from airports
+		where airports.iata = departure_code
+	) as departure_country,
+	(
+		select airports.country
+		from airports
+		where airports.iata = arrival_code
+	) as arrival_country
+from (
+	select t.departure_code, t.arrival_code, t.passengers
+	from traffic as t
+	join airports as a
+	on a.iata = t.departure_code
+);
+"""
 """
 route_data = {
-	country :: String, 
+	departure_code :: String,
+	arrival_code :: String 
 	passenger_volume :: Integer,
-	population :: Integer,
+	departure_country :: String,
+	arrival_country :: String,
 }
 """
 route_data = c.execute(connectedness_query)
 
-case_query = ""
+case_query = """
+select date, country, cases
+from cases
+where country is not null
+"""
 """
 case_data = {
 	date :: Date,
 	country :: String,
 	cases :: Integer,
+	population :: Integer
 }
 """
 case_data = c.execute(case_query)
