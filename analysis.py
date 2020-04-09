@@ -11,6 +11,7 @@ import statsmodels.formula.api as smf
 conn = sqlite3.connect('data.db')
 c = conn.cursor()
 
+# TODO: Condense these two into one query
 connectedness_query = """
 select *,
 	(
@@ -42,10 +43,10 @@ route_data = {
 route_data = [row for row in c.execute(connectedness_query)]
 
 case_query = """
-select ca.date, ca.country, ca.cases, co.population
+select ca.date, ca.country, ca.confirmed, co.population
 from cases as ca
 join countries as co
-on cases.country = countries.country
+on cases.country = countries.name
 where country is not null
 """
 """
@@ -72,6 +73,7 @@ joined_data = []
 # Now we have something we can do regression on
 X = joined_data
 
+# NOTE: Every below here is just copy-pasted from multiple-regression.py
 def train_test_split(x, y, test_pct):
 	"""input:
 	x: list of x values, y: list of independent values, test_pct: percentage of the data that is testing data=0.2.
