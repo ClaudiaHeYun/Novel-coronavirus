@@ -42,8 +42,10 @@ route_data = {
 route_data = c.execute(connectedness_query)
 
 case_query = """
-select date, country, cases
-from cases
+select ca.date, ca.country, ca.cases, co.population
+from cases as ca
+join countries as co
+on cases.country = countries.country
 where country is not null
 """
 """
