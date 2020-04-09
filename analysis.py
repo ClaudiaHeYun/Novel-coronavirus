@@ -39,7 +39,7 @@ route_data = {
 	arrival_country :: String,
 }
 """
-route_data = c.execute(connectedness_query)
+route_data = [row for row in c.execute(connectedness_query)]
 
 case_query = """
 select ca.date, ca.country, ca.cases, co.population
@@ -56,12 +56,14 @@ case_data = {
 	population :: Integer
 }
 """
-case_data = c.execute(case_query)
+case_rows = [row for row in c.execute(case_query)]
 
 # Join case data and route data on country
 # We now have a time series of cases of over time matched with
 # flight route data. This is our baseline dataset.
 # Probably create a pandas dataframe here
+# TODO: Doing this part is one of the tricky bits. This should be done with SQL
+# but could also be done manually
 joined_data = []
 
 # Compute case rates by dividing case counts by population
