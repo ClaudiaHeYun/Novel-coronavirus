@@ -11,7 +11,6 @@ import statsmodels.formula.api as smf
 def get_connectedness_data(db_location):
 	conn = sqlite3.connect(db_location)
 	c = conn.cursor()
-	# TODO: Condense these two into one query
 	connectedness_query = """
 	select
 		count(),
