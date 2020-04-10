@@ -1,6 +1,7 @@
 import sqlite3
 import csv
 import datetime
+import json
 
 DATA_PATH = "data"
 
@@ -22,8 +23,10 @@ australia_reader = csv.DictReader(australia_csv)
 china_csv = open(f"{DATA_PATH}/population/china-populations-2018.csv")
 china_reader = csv.DictReader(china_csv)
 
-case_reports_csv = open(f"{DATA_PATH}/virus/infections.csv")
-cases_reader = csv.DictReader(case_reports_csv)
+# case_reports_csv = open(f"{DATA_PATH}/virus/infections.csv")
+# cases_reader = csv.DictReader(case_reports_csv)
+case_reports_file = open(f"{DATA_PATH}/virus/case_series.json")
+cases_json = json.load(case_reports_file)
 
 airports_csv = open(f"{DATA_PATH}/flights/airports.csv")
 airports_reader = csv.DictReader(airports_csv)
@@ -155,14 +158,14 @@ for row in country_reader:
         row["Density (persons per sq. km.)"]))
 
 # TODO clean up US and UK names in order to join by foreign key
-for row in cases_reader:
-    c.execute("INSERT INTO cases (date, state, country, confirmed, deaths, recovered) VALUES (?, ?, ?, ?, ?, ?)", (
-        str(datetime.datetime.now()),
-        row["state"], 
-        row["country"], 
-        row["confirmed"], 
-        row["deaths"],
-        row["recovered"]))
+labels = cases_json["labels"]
+print(labels)
+for row in cases_json["countries"]:
+    for date, daily_total in zip(labels[2], row[2]):
+        c.execute("INSERT INTO cases (date, country, confirmed) VALUES (?, ?, ?)", (
+            date,
+            row[1], 
+            daily_total))
 
 for row in airports_reader:
     # NOTE: IATA codes has \N when no code is known. There 1626 such records
@@ -194,7 +197,7 @@ conn.close()
 cities_csv.close()
 countries_csv.close()
 states_csv.close()
-case_reports_csv.close()
+case_reports_file.close()
 canada_csv.close()
 china_csv.close()
 routes_csv.close()

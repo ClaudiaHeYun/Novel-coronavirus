@@ -18,12 +18,15 @@ if __name__ == "__main__":
 	SERIES_URL = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
 	r = requests.get(SERIES_URL)
 	# Collapse states into single country
-	countries = {}
+	countries = []
 	# Using a dictreader turns the first row into fieldnames
 	f = io.StringIO(r.text)
 	reader = csv.reader(f)
 	# NOTE: The header row will be useful when running time series
-	next(reader) # skip header line
+	labels = next(reader) # skip header line
+	labels = ["State", "Country", labels[4:]]
+	print(labels)
+	output = { "labels": labels }
 	for row in reader:
 		cur_country = row[1] # country/region
 		cur_row = parse_row(row)
@@ -31,9 +34,10 @@ if __name__ == "__main__":
 			old_row = countries[cur_country]
 			new_row = add_rows(old_row, cur_row)
 		else:
-			countries[cur_country] = cur_row
+			countries.append(cur_row)
+	output["countries"] = countries
 	# Write out the simplified json
 	with open("case_series.json", "w") as case_file:
-		json.dump(countries, case_file)
+		json.dump(output, case_file)
 
 
