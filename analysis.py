@@ -11,69 +11,77 @@ import statsmodels.formula.api as smf
 conn = sqlite3.connect('data.db')
 c = conn.cursor()
 
-# TODO: Condense these two into one query
-connectedness_query = """
-select *,
-	(
-		select airports.country
-		from airports
-		where airports.iata = departure_code
-	) as departure_country,
-	(
-		select airports.country
-		from airports
-		where airports.iata = arrival_code
-	) as arrival_country
-from (
-	select t.departure_code, t.arrival_code, t.passengers
-	from traffic as t
-	join airports as a
-	on a.iata = t.departure_code
-);
-"""
-"""
-route_data = {
-	departure_code :: String,
-	arrival_code :: String 
-	passenger_volume :: Integer,
-	departure_country :: String,
-	arrival_country :: String,
-}
-"""
-route_data = [row for row in c.execute(connectedness_query)]
+def get_connectedness_data():
+	# TODO: Condense these two into one query
+	connectedness_query = """
+	select
+		count(),
+		sum(connections.passengers),
+		connections.arrival_country,
+		group_concat(case_data.country, ","),
+		group_concat(case_data.population, ","),
+		group_concat(case_data.confirmed, ","),
+		case_data.date
+	from (
+		select *,
+			(
+				select airports.country
+				from airports
+				where airports.iata = departure_code
+			) as departure_country,
+			(
+				select airports.country
+				from airports
+				where airports.iata = arrival_code
+			) as arrival_country
+		from (
+			select t.departure_code, t.arrival_code, t.passengers
+			from traffic as t
+			join airports as a
+			on a.iata = t.departure_code
+		)
+	) as connections
+	join (
+		select ca.date, ca.country, ca.confirmed, co.population
+		from cases as ca
+		join countries as co
+		on ca.country = co.name
+	) as case_data
+	on case_data.country = connections.departure_country
+	group by connections.arrival_country;
+	"""
+	# Join case data and route data on country
+	# We now have a time series of cases of over time matched with
+	# flight route data. This is our baseline dataset.
+	# Probably create a pandas dataframe here
+	connectedness_data = [row for row in c.execute(connectedness_query)]
+	"""
+	connectedness_data = {
+		number of incoming routes :: Integer,
+		country :: String
+		number of incoming passengers :: Integer,
+		list of incoming countries :: String (comma separated)
+		list of incoming populations :: String (comma separated)
+		list of case data :: String (comma separated)
+		date :: String
+	}
+	"""
 
-case_query = """
-select ca.date, ca.country, ca.confirmed, co.population
-from cases as ca
-join countries as co
-on cases.country = countries.name
-where country is not null
-"""
-"""
-case_data = {
-	date :: Date,
-	country :: String,
-	cases :: Integer,
-	population :: Integer
-}
-"""
-case_rows = [row for row in c.execute(case_query)]
+	# Compute case rates by dividing case counts by population
+	# We may want to experiment during the regression step with
+	# different ways of generating this number.
+	# Now we at least have something we can do regression on
+	X = []
+	for row in connectedness_data:
+		incoming_countries = row[3].split(",")
+		incoming_populations = [int(num) for num in row[4].split(",")]
+		incoming_cases = [int(case) for case in row[5].split(",")]
+		viral_pressure = sum([cases / pop for cases, pop in zip(incoming_cases, incoming_populations)])
+		new_row = [row[0], row[1], row[2], incoming_countries, incoming_populations, incoming_cases, viral_pressure]
+		X.append(new_row)
+	return X
 
-# Join case data and route data on country
-# We now have a time series of cases of over time matched with
-# flight route data. This is our baseline dataset.
-# Probably create a pandas dataframe here
-# TODO: Doing this part is one of the tricky bits. This should be done with SQL
-# but could also be done manually
-joined_data = []
-
-# Compute case rates by dividing case counts by population
-# We may want to experiment during the regression step with
-# different ways of generating this number.
-# Now we have something we can do regression on
-X = joined_data
-
-# NOTE: Every below here is just copy-pasted from multiple-regression.py
+# NOTE: Everything below here is just copy-pasted from multiple-regression.py
 def train_test_split(x, y, test_pct):
 	"""input:
 	x: list of x values, y: list of independent values, test_pct: percentage of the data that is testing data=0.2.
@@ -94,18 +102,21 @@ def train_test_split(x, y, test_pct):
 	return (x_train, x_test, y_train, y_test)
 
 if __name__ == "__main__":
-	# TODO: use train test split to split data into x_train, x_test, y_train, y_test #
+	X = get_connectedness_data()
+	# TODO: Collect y
+	
+	# Use train test split to split data into x_train, x_test, y_train, y_test #
 	(x_train, x_test, y_train, y_test) = train_test_split(X, y, p)
 	# print(type(x_train), type(x_test), type(y_train))
 
-	# TODO: Use StatsModels to create the Linear Model and Output R-squared
+	# Use StatsModels to create the Linear Model and Output R-squared
 	x_train = sm.add_constant(x_train) # add a constant column to be intercept
 	model = sm.OLS(y_train, x_train)
 	results = model.fit()
 	print(results.summary())
 
-	# Prints out the Report
-	# TODO: print R-squared, test MSE & train MSE
+	# Prints out a report containing
+	# R-squared, test MSE & train MSE
 	print(f"R2: {results.rsquared}")
 	training_mse = eval_measures.mse(y_train, results.predict(x_train))
 	print(f"Training MSE: {training_mse}")

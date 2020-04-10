@@ -1,12 +1,12 @@
--- -- select number of incoming routes, country, total number of incoming passengers
--- select count(), airports.country, sum(traffic.passengers)
--- from traffic
--- join airports
--- -- incoming flights
--- on traffic.arrival_code == airports.iata
--- group by country
--- limit 10;
-select count(), sum(connections.passengers), connections.arrival_country, case_data.population, sum(case_data.confirmed), case_data.date
+-- TODO: I'm not great at SQL so I'm not totally sure if this does what we want
+select
+	count(),
+	sum(connections.passengers),
+	connections.arrival_country,
+	group_concat(case_data.country, ","),
+	group_concat(case_data.population, ","),
+	group_concat(case_data.confirmed, ","),
+	case_data.date
 from (
 	select *,
 		(
