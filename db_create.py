@@ -22,7 +22,7 @@ australia_reader = csv.DictReader(australia_csv)
 china_csv = open(f"{DATA_PATH}/population/china-populations-2018.csv")
 china_reader = csv.DictReader(china_csv)
 
-case_reports_csv = open(f"{DATA_PATH}/virus/cleaned_infections.csv")
+case_reports_csv = open(f"{DATA_PATH}/virus/infections.csv")
 cases_reader = csv.DictReader(case_reports_csv)
 
 airports_csv = open(f"{DATA_PATH}/flights/airports.csv")

@@ -9,6 +9,7 @@ verify_ssl = true
 numpy = "*"
 pandas = "*"
 statsmodels = "*"
+requests = "*"
 
 [requires]
 python_version = "3.8"
