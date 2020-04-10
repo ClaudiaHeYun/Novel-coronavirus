@@ -25,8 +25,7 @@ if __name__ == "__main__":
 			cur_row = parse_row(row)
 			countries[cur_row] = row.keys
 	# Write out the simplified json
-	countries_json = json.dumps(countries)
 	with open("case_series.json", "w") as case_file:
-		case_file.write(countries_json)
+		json.dump(countries, case_file)
 
 
