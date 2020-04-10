@@ -1,13 +1,17 @@
 import requests
 import csv
 import json
+import io
 
 def add_rows(a, b):
-
-	return []
+	return (a[0], a[2], [i + j for i, j in zip(a[2], b[2])])
 
 def parse_row(row):
-	return []
+	state, country, lat, lon, *daily_totals = row
+	lat = float(lat)
+	lon = float(lon)
+	daily_totals = [int(total) for total in daily_totals]
+	return (state, country, daily_totals)
 
 if __name__ == "__main__":
 	# Get CSV
@@ -15,15 +19,19 @@ if __name__ == "__main__":
 	r = requests.get(SERIES_URL)
 	# Collapse states into single country
 	countries = {}
-	for row in csv.DictReader(r.content):
-		cur_country = row["Country/Region"]
+	# Using a dictreader turns the first row into fieldnames
+	f = io.StringIO(r.text)
+	reader = csv.reader(f)
+	# NOTE: The header row will be useful when running time series
+	next(reader) # skip header line
+	for row in reader:
+		cur_country = row[1] # country/region
+		cur_row = parse_row(row)
 		if cur_country in countries:
 			old_row = countries[cur_country]
-			cur_row = parse_row(row)
 			new_row = add_rows(old_row, cur_row)
 		else:
-			cur_row = parse_row(row)
-			countries[cur_row] = row.keys
+			countries[cur_country] = cur_row
 	# Write out the simplified json
 	with open("case_series.json", "w") as case_file:
 		json.dump(countries, case_file)
