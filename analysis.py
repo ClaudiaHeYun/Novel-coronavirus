@@ -8,10 +8,9 @@ import statsmodels.api as sm
 from statsmodels.tools import eval_measures
 import statsmodels.formula.api as smf
 
-conn = sqlite3.connect('data.db')
-c = conn.cursor()
-
-def get_connectedness_data():
+def get_connectedness_data(db_location):
+	conn = sqlite3.connect(db_location)
+	c = conn.cursor()
 	# TODO: Condense these two into one query
 	connectedness_query = """
 	select
@@ -102,9 +101,9 @@ def train_test_split(x, y, test_pct):
 	return (x_train, x_test, y_train, y_test)
 
 if __name__ == "__main__":
-	X = get_connectedness_data()
+	X = get_connectedness_data("data.db")
 	# TODO: Collect y
-	
+
 	# Use train test split to split data into x_train, x_test, y_train, y_test #
 	(x_train, x_test, y_train, y_test) = train_test_split(X, y, p)
 	# print(type(x_train), type(x_test), type(y_train))
