@@ -10,6 +10,8 @@ def parse_row(row):
 	state, country, lat, lon, *daily_totals = row
 	lat = float(lat)
 	lon = float(lon)
+	if country == "US":
+		country = "United States"
 	daily_totals = [int(total) for total in daily_totals]
 	return (state, country, daily_totals)
 
@@ -25,7 +27,6 @@ if __name__ == "__main__":
 	# NOTE: The header row will be useful when running time series
 	labels = next(reader) # skip header line
 	labels = ["State", "Country", labels[4:]]
-	print(labels)
 	output = { "labels": labels }
 	for row in reader:
 		cur_country = row[1] # country/region

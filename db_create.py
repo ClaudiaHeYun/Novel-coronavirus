@@ -159,7 +159,6 @@ for row in country_reader:
 
 # TODO clean up US and UK names in order to join by foreign key
 labels = cases_json["labels"]
-print(labels)
 for row in cases_json["countries"]:
     for date, daily_total in zip(labels[2], row[2]):
         c.execute("INSERT INTO cases (date, country, confirmed) VALUES (?, ?, ?)", (
