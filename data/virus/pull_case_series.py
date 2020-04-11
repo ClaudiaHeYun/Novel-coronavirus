@@ -4,9 +4,11 @@ import json
 import io
 
 def add_rows(a, b):
+	"""Add up case totals between two rows"""
 	return (a[0], a[2], [i + j for i, j in zip(a[2], b[2])])
 
 def parse_row(row):
+	"""Takes a row and converts each field to the appropriate type"""
 	state, country, lat, lon, *daily_totals = row
 	lat = float(lat)
 	lon = float(lon)
@@ -21,7 +23,6 @@ if __name__ == "__main__":
 	r = requests.get(SERIES_URL)
 	# Collapse states into single country
 	countries = []
-	# Using a dictreader turns the first row into fieldnames
 	f = io.StringIO(r.text)
 	reader = csv.reader(f)
 	# NOTE: The header row will be useful when running time series

@@ -9,6 +9,9 @@ from statsmodels.tools import eval_measures
 import statsmodels.formula.api as smf
 
 def get_connectedness_data(db_location):
+	"""
+	Pulls connectedness data from the database then calculates the viral pressure on each node
+	"""
 	conn = sqlite3.connect(db_location)
 	c = conn.cursor()
 	connectedness_query = """
