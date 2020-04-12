@@ -96,6 +96,67 @@ def get_connectedness_data(db_location):
 		X.append(new_row)
 	return X
 
+
+def get_case_data(db_location):
+	"""
+	Pulls case data from the database
+	"""
+	conn = sqlite3.connect(db_location)
+	c = conn.cursor()
+	case_query = """
+	select country, date, confirmed
+	from cases
+	order by country, date;
+	"""
+	# 
+	# Probably create a pandas dataframe here
+	case_data = [row for row in c.execute(case_query)]
+	"""
+	case_data = {
+		country :: String,
+		date :: String,
+		number of confirmed cases :: Integer
+	}
+	"""
+	# there's definitely a better way to do this
+
+
+	y = []
+	"""
+	y = {
+		country :: String,
+		date :: String,
+		days until/since (positive/negative) first case :: Integer
+	}
+	"""
+	# does the days since infection; negative
+	prev_country = case_data[0][0]
+	days = 0
+	for row in case_data:
+		if (prev_country != row[0]):
+			prev_country = row[0]
+			days = 0
+		if row[2] > 0:
+			days -= 1
+		new_row = row
+		new_row[2] = days
+		y.append(new_row)
+
+	# does days until infection; positive
+	prev_country = y[-1][0]
+	days = 1
+	i = len(y)
+	while i >= 0:
+		if (prev_country != row[0]):
+			prev_country = row[0]
+			days = 0
+		if row[2] < 1:
+			days += 1
+			y[i][2] = days
+		i -= 1
+
+	return y
+
 # NOTE: Everything below here is just copy-pasted from multiple-regression.py
 def train_test_split(x, y, test_pct):
 	"""input:
