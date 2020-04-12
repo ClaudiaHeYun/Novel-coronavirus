@@ -8,6 +8,18 @@ import statsmodels.api as sm
 from statsmodels.tools import eval_measures
 import statsmodels.formula.api as smf
 
+
+def pressure_as_cases_per_pop_times_traffic_volume(
+	incoming_cases,
+	incoming_traffic,
+	incoming_populations):
+	return sum([cases / pop for cases, pop in zip(incoming_cases, incoming_populations)])
+
+
+def viral_pressure(*args):
+	"""A flexible function for calculating the viral pressure on a given country"""
+	return pressure_as_cases_per_pop_times_traffic_volume(*args)
+
 def get_connectedness_data(db_location):
 	"""
 	Pulls connectedness data from the database then calculates the viral pressure on each node
@@ -61,6 +73,7 @@ def get_connectedness_data(db_location):
 		number of incoming routes :: Integer,
 		country :: String
 		number of incoming passengers :: Integer,
+		# TODO: Need to add a list of incoming passengers here
 		list of incoming countries :: String (comma separated)
 		list of incoming populations :: String (comma separated)
 		list of case data :: String (comma separated)
@@ -77,7 +90,8 @@ def get_connectedness_data(db_location):
 		incoming_countries = row[3].split(",")
 		incoming_populations = [int(num) for num in row[4].split(",")]
 		incoming_cases = [int(case) for case in row[5].split(",")]
-		viral_pressure = sum([cases / pop for cases, pop in zip(incoming_cases, incoming_populations)])
+		# TODO: This is wrong!!
+		viral_pressure = viral_pressure(incoming_cases, incoming_populations)
 		new_row = [row[0], row[1], row[2], incoming_countries, incoming_populations, incoming_cases, viral_pressure]
 		X.append(new_row)
 	return X
