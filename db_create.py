@@ -83,7 +83,7 @@ c.execute('''CREATE TABLE countries(
 
 c.execute('''CREATE TABLE cases(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    date TEXT,
+    date DATE,
     state TEXT,
     country TEXT,
     confirmed INTEGER,
@@ -159,10 +159,23 @@ for row in country_reader:
 
 # TODO clean up US and UK names in order to join by foreign key
 labels = cases_json["labels"]
+print(labels)
 for row in cases_json["countries"]:
     for date, daily_total in zip(labels[2], row[2]):
+        m_d_y = date.split("/")
+        year = "20" + m_d_y[-1]
+        if len(m_d_y[0]) == 1:
+            month = "0" + m_d_y[0]
+        else:
+            month = m_d_y
+        if len(m_d_y[1]) == 1:
+            day = "0" + m_d_y[1]
+        else:
+            day = m_d_y[1]
+        YYYY_MM_DD = year + "-" + month + "-" + day
+        print(YYYY_MM_DD)
         c.execute("INSERT INTO cases (date, country, confirmed) VALUES (?, ?, ?)", (
-            date,
+            YYYY_MM_DD,
             row[1], 
             daily_total))
 

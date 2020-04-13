@@ -77,7 +77,7 @@ def get_connectedness_data(db_location):
 		list of incoming countries :: String (comma separated)
 		list of incoming populations :: String (comma separated)
 		list of case data :: String (comma separated)
-		date :: String
+		date :: date
 	}
 	"""
 
@@ -91,7 +91,8 @@ def get_connectedness_data(db_location):
 		incoming_populations = [int(num) for num in row[4].split(",")]
 		incoming_cases = [int(case) for case in row[5].split(",")]
 		# TODO: This is wrong!!
-		v_pressure = viral_pressure(incoming_cases, incoming_populations)
+		# v_pressure = viral_pressure(incoming_cases, incoming_populations)
+		v_pressure = 1
 		new_row = [row[0], row[1], row[2], incoming_countries, incoming_populations, incoming_cases, v_pressure, row[-1]]
 		X.append(new_row)
 	return X
@@ -114,7 +115,7 @@ def get_case_data(db_location):
 	"""
 	case_data = {
 		country :: String,
-		date :: String,
+		date :: date,
 		number of confirmed cases :: Integer
 	}
 	"""
@@ -138,23 +139,24 @@ def get_case_data(db_location):
 			days = 0
 		if row[2] > 0:
 			days -= 1
-		new_row = row
-		new_row[2] = days
+		new_row = [row[0], row[1], days]
+		# new_row[2] = days
 		y.append(new_row)
 
 	# does days until infection; positive
 	prev_country = y[-1][0]
-	days = 1
-	i = len(y)
+	days = 0
+	i = len(y) - 1
 	while i >= 0:
-		if (prev_country != row[0]):
-			prev_country = row[0]
+		if (prev_country != y[i][0]):
+			prev_country = y[i][0]
 			days = 0
-		if row[2] < 1:
-			days += 1
+		if y[i][2] > -1:
 			y[i][2] = days
+			days += 1
 		i -= 1
 
+	print(y)
 	return y
 
 def pair_Xy(X, y):
@@ -198,6 +200,7 @@ if __name__ == "__main__":
 
 	(X, y) = pair_Xy(X, y)
 
+	p = 0.2
 	# Use train test split to split data into x_train, x_test, y_train, y_test #
 	(x_train, x_test, y_train, y_test) = train_test_split(X, y, p)
 	# print(type(x_train), type(x_test), type(y_train))
