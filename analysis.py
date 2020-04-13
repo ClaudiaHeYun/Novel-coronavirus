@@ -9,18 +9,10 @@ from statsmodels.tools import eval_measures
 import statsmodels.formula.api as smf
 
 
-<<<<<<< Updated upstream
-def pressure_as_cases_per_pop_times_traffic_volume(
-	incoming_cases,
-	incoming_traffic,
-	incoming_populations):
-	return sum([cases / pop for cases, pop in zip(incoming_cases, incoming_populations)])
-=======
 def pressure_as_cases_per_pop_times_traffic_volume(*args):
 	# TODO: Normalize this data!
 	incoming_cases, incoming_traffic, incoming_populations, *rest = args
 	return sum([(cases / pop) * traffic for cases, traffic, pop in zip(incoming_cases, incoming_traffic, incoming_populations)])
->>>>>>> Stashed changes
 
 
 def viral_pressure(*args):
