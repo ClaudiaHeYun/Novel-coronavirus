@@ -9,16 +9,23 @@ from statsmodels.tools import eval_measures
 import statsmodels.formula.api as smf
 
 
+<<<<<<< Updated upstream
 def pressure_as_cases_per_pop_times_traffic_volume(
 	incoming_cases,
 	incoming_traffic,
 	incoming_populations):
 	return sum([cases / pop for cases, pop in zip(incoming_cases, incoming_populations)])
+=======
+def pressure_as_cases_per_pop_times_traffic_volume(*args):
+	# TODO: Normalize this data!
+	incoming_cases, incoming_traffic, incoming_populations, *rest = args
+	return sum([(cases / pop) * traffic for cases, traffic, pop in zip(incoming_cases, incoming_traffic, incoming_populations)])
+>>>>>>> Stashed changes
 
 
 def viral_pressure(*args):
 	"""A flexible function for calculating the viral pressure on a given country"""
-	return pressure_as_cases_per_pop_times_traffic_volume(*args)
+	return pressure_as_cases_per_pop_times_traffic_volume(args)
 
 def get_connectedness_data(db_location):
 	"""
@@ -36,7 +43,7 @@ def get_connectedness_data(db_location):
 		group_concat(case_data.confirmed, ","),
 		case_data.date
 	from (
-		select *,
+		select *
 			(
 				select airports.country
 				from airports
@@ -61,7 +68,7 @@ def get_connectedness_data(db_location):
 		on ca.country = co.name
 	) as case_data
 	on case_data.country = connections.departure_country
-	group by connections.arrival_country;
+	group by connections.arrival_country
 	"""
 	# Join case data and route data on country
 	# We now have a time series of cases of over time matched with
@@ -70,14 +77,16 @@ def get_connectedness_data(db_location):
 	connectedness_data = [row for row in c.execute(connectedness_query)]
 	"""
 	connectedness_data = {
+		[
 		number of incoming routes :: Integer,
-		country :: String
+		country :: String,
 		number of incoming passengers :: Integer,
-		# TODO: Need to add a list of incoming passengers here
-		list of incoming countries :: String (comma separated)
-		list of incoming populations :: String (comma separated)
-		list of case data :: String (comma separated)
+		list of incoming passenger volume :: String (comma separated),
+		list of incoming countries :: String (comma separated),
+		list of incoming populations :: String (comma separated),
+		list of case data :: String (comma separated),
 		date :: date
+		]
 	}
 	"""
 
@@ -86,6 +95,8 @@ def get_connectedness_data(db_location):
 	# different ways of generating this number.
 	# Now we at least have something we can do regression on
 	X = []
+	# One row per country at a 
+	# TODO: Date
 	for row in connectedness_data:
 		incoming_countries = row[3].split(",")
 		incoming_populations = [int(num) for num in row[4].split(",")]
@@ -169,6 +180,18 @@ def pair_Xy(X, y):
 				break
 	return X_paired, y_paired
 
+# Goal data spec for running regressions
+# X_all = [Date :: Date, Country :: String, Viral pressure :: Float]
+# Y_all = [Date :: Date, Country :: String, Days to infection :: Integer]
+# Train test split on countries X_i
+
+# Evan's TODO:
+# 1. Wire up the regression
+# 2. Double check code for gettting Y_all
+# 3. Test on fake data
+
+# Quinn's TODO:
+# 1. Get connectedness data
 
 # NOTE: Everything below here is just copy-pasted from multiple-regression.py
 def train_test_split(x, y, test_pct):
