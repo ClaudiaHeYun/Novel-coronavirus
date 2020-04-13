@@ -92,6 +92,7 @@ def get_connectedness_data(db_location):
 		incoming_cases = [int(case) for case in row[5].split(",")]
 		# TODO: This is wrong!!
 		# v_pressure = viral_pressure(incoming_cases, incoming_populations)
+		# TODO: remove; just did this because the viral pressure function isn't complete
 		v_pressure = 1
 		new_row = [row[0], row[1], row[2], incoming_countries, incoming_populations, incoming_cases, v_pressure, row[-1]]
 		X.append(new_row)
@@ -121,7 +122,6 @@ def get_case_data(db_location):
 	"""
 	# there's definitely a better way to do this
 
-
 	y = []
 	"""
 	y = {
@@ -130,7 +130,7 @@ def get_case_data(db_location):
 		days until/since (positive/negative) first case :: Integer
 	}
 	"""
-	# does the days since infection; negative
+	# days since infection; negative
 	prev_country = case_data[0][0]
 	days = 0
 	for row in case_data:
@@ -140,10 +140,9 @@ def get_case_data(db_location):
 		if row[2] > 0:
 			days -= 1
 		new_row = [row[0], row[1], days]
-		# new_row[2] = days
 		y.append(new_row)
 
-	# does days until infection; positive
+	# days until infection; positive
 	prev_country = y[-1][0]
 	days = 0
 	i = len(y) - 1
@@ -156,7 +155,6 @@ def get_case_data(db_location):
 			days += 1
 		i -= 1
 
-	print(y)
 	return y
 
 def pair_Xy(X, y):
@@ -164,11 +162,10 @@ def pair_Xy(X, y):
 	X_paired = []
 	for X_row in X:
 		for y_row in y:
-			if X_row[1] == y_row[0] and X_row[-1] == y_row[1]:
-				X_row.pop(1)
+			if X_row[2] == y_row[0] and X_row[-1] == y_row[1]:
+				X_row.pop(2)
 				y_paired.append(y_row[2])
 				X_paired.append(X_row[:-1])
-				# yX_pairs.append((y_row[2], X_row[:-1]))
 				break
 	return X_paired, y_paired
 
@@ -194,13 +191,14 @@ def train_test_split(x, y, test_pct):
 	return (x_train, x_test, y_train, y_test)
 
 if __name__ == "__main__":
+	p = 0.2
 	X = get_connectedness_data("data.db")
 	y = get_case_data("data.db")
 	# TODO: Collect y
 
 	(X, y) = pair_Xy(X, y)
 
-	p = 0.2
+
 	# Use train test split to split data into x_train, x_test, y_train, y_test #
 	(x_train, x_test, y_train, y_test) = train_test_split(X, y, p)
 	# print(type(x_train), type(x_test), type(y_train))

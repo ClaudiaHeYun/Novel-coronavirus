@@ -173,7 +173,6 @@ for row in cases_json["countries"]:
         else:
             day = m_d_y[1]
         YYYY_MM_DD = year + "-" + month + "-" + day
-        print(YYYY_MM_DD)
         c.execute("INSERT INTO cases (date, country, confirmed) VALUES (?, ?, ?)", (
             YYYY_MM_DD,
             row[1], 
