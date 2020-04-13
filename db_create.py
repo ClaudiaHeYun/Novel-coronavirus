@@ -160,22 +160,12 @@ for row in country_reader:
 # TODO clean up US and UK names in order to join by foreign key
 labels = cases_json["labels"]
 print(labels)
-for row in cases_json["countries"]:
-    for date, daily_total in zip(labels[2], row[2]):
-        m_d_y = date.split("/")
-        year = "20" + m_d_y[-1]
-        if len(m_d_y[0]) == 1:
-            month = "0" + m_d_y[0]
-        else:
-            month = m_d_y
-        if len(m_d_y[1]) == 1:
-            day = "0" + m_d_y[1]
-        else:
-            day = m_d_y[1]
-        YYYY_MM_DD = year + "-" + month + "-" + day
+for country, daily_totals in cases_json["countries"].values():
+    dates = labels[2]
+    for date, daily_total in zip(dates, daily_totals):
         c.execute("INSERT INTO cases (date, country, confirmed) VALUES (?, ?, ?)", (
-            YYYY_MM_DD,
-            row[1], 
+            date,
+            country, 
             daily_total))
 
 for row in airports_reader:

@@ -10,7 +10,7 @@ def add_rows(a, b):
 
 def parse_row(row):
 	"""Takes a row and converts each field to the appropriate type"""
-	state, country, lat, lon, *daily_totals = row
+	_, country, lat, lon, *daily_totals = row
 	lat = float(lat)
 	lon = float(lon)
 	if country == "US":
@@ -32,7 +32,7 @@ if __name__ == "__main__":
 	output = { "labels": labels }
 	for row in reader:
 		cur_row = parse_row(row)
-		cur_country = row[0] # country/region
+		cur_country = cur_row[0] # country/region
 		if cur_country in countries:
 			old_row = countries[cur_country]
 			new_row = add_rows(old_row, cur_row)
