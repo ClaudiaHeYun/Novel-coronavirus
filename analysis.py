@@ -13,7 +13,8 @@ def pressure_as_cases_per_pop_times_traffic_volume(
 	incoming_cases,
 	incoming_traffic,
 	incoming_populations):
-	return sum([cases / pop for cases, pop in zip(incoming_cases, incoming_populations)])
+	# TODO: Normalize this data!
+	return sum([(cases / pop) * traffic for cases, traffic, pop in zip(incoming_cases, incoming_traffic, incoming_populations)])
 
 
 def viral_pressure(*args):
@@ -30,6 +31,7 @@ def get_connectedness_data(db_location):
 	select
 		count(),
 		sum(connections.passengers),
+		group_concat(connections.passengers),
 		connections.arrival_country,
 		group_concat(case_data.country, ","),
 		group_concat(case_data.population, ","),
@@ -73,7 +75,7 @@ def get_connectedness_data(db_location):
 		number of incoming routes :: Integer,
 		country :: String
 		number of incoming passengers :: Integer,
-		# TODO: Need to add a list of incoming passengers here
+		list of incoming passenger volume :: String (comma separated),
 		list of incoming countries :: String (comma separated)
 		list of incoming populations :: String (comma separated)
 		list of case data :: String (comma separated)
@@ -87,14 +89,15 @@ def get_connectedness_data(db_location):
 	# Now we at least have something we can do regression on
 	X = []
 	for row in connectedness_data:
-		incoming_countries = row[3].split(",")
-		incoming_populations = [int(num) for num in row[4].split(",")]
-		incoming_cases = [int(case) for case in row[5].split(",")]
+		incoming_traffic = row[3].split(",")
+		incoming_countries = row[4].split(",")
+		incoming_populations = [int(num) for num in row[5].split(",")]
+		incoming_cases = [int(case) for case in row[6].split(",")]
 		# TODO: This is wrong!!
 		# v_pressure = viral_pressure(incoming_cases, incoming_populations)
 		# TODO: remove; just did this because the viral pressure function isn't complete
 		v_pressure = 1
-		new_row = [row[0], row[1], row[2], incoming_countries, incoming_populations, incoming_cases, v_pressure, row[-1]]
+		new_row = [row[0], row[1], row[2], incoming_countries, incoming_traffic, incoming_populations, incoming_cases, v_pressure, row[-1]]
 		X.append(new_row)
 	return X
 
