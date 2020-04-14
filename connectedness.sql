@@ -1,11 +1,10 @@
 -- TODO: I'm not great at SQL so I'm not totally sure if this does what we want
 select
-	count(),
-	sum(connections.passengers),
 	connections.arrival_country,
-	group_concat(case_data.country, ","),
-	group_concat(case_data.population, ","),
-	group_concat(case_data.confirmed, ","),
+	connections.passengers,
+	case_data.country,
+	case_data.population,
+	case_data.confirmed,
 	case_data.date
 from (
 	select *,
@@ -33,4 +32,5 @@ join (
 	on ca.country = co.name
 ) as case_data
 on case_data.country = connections.departure_country
-group by connections.arrival_country;
+where arrival_country != departure_country -- only international flights
+;

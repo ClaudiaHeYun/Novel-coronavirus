@@ -3,21 +3,31 @@ import numpy as np
 import pandas as pd
 import random
 import csv
+import json
 from scipy import stats
 import statsmodels.api as sm
 from statsmodels.tools import eval_measures
 import statsmodels.formula.api as smf
+from datetime import date
 
 
 def pressure_as_cases_per_pop_times_traffic_volume(*args):
 	# TODO: Normalize this data!
-	incoming_cases, incoming_traffic, incoming_populations, *rest = args
-	return sum([(cases / pop) * traffic for cases, traffic, pop in zip(incoming_cases, incoming_traffic, incoming_populations)])
+	cases, pop, traffic = args
+	return (cases / pop) * traffic
 
 
-def viral_pressure(*args):
+def calc_viral_pressure(*args):
 	"""A flexible function for calculating the viral pressure on a given country"""
-	return pressure_as_cases_per_pop_times_traffic_volume(args)
+	return pressure_as_cases_per_pop_times_traffic_volume(*args)
+
+def parse_row(row):
+	"""Parses a row of connectedness data into python data types"""
+	# month, day, year = row[5].split("/")
+	# year = int("20" + year)
+	# date(year, int(month), int(day))
+	new_row = [row[0], int(row[1]), row[2], int(row[3]), int(row[4]), row[5]]
+	return new_row
 
 def get_connectedness_data(db_location):
 	"""
@@ -27,15 +37,14 @@ def get_connectedness_data(db_location):
 	c = conn.cursor()
 	connectedness_query = """
 	select
-		count(),
-		sum(connections.passengers),
 		connections.arrival_country,
-		group_concat(case_data.country, ","),
-		group_concat(case_data.population, ","),
-		group_concat(case_data.confirmed, ","),
+		connections.passengers,
+		case_data.country,
+		case_data.population,
+		case_data.confirmed,
 		case_data.date
 	from (
-		select *
+		select *,
 			(
 				select airports.country
 				from airports
@@ -60,45 +69,52 @@ def get_connectedness_data(db_location):
 		on ca.country = co.name
 	) as case_data
 	on case_data.country = connections.departure_country
-	group by connections.arrival_country
+	where arrival_country != departure_country -- only international flights
 	"""
 	# Join case data and route data on country
 	# We now have a time series of cases of over time matched with
 	# flight route data. This is our baseline dataset.
 	# Probably create a pandas dataframe here
-	connectedness_data = [row for row in c.execute(connectedness_query)]
+	connectedness_data = [parse_row(row) for row in c.execute(connectedness_query)]
 	"""
-	connectedness_data = {
-		[
-		number of incoming routes :: Integer,
-		country :: String,
-		number of incoming passengers :: Integer,
-		list of incoming passenger volume :: String (comma separated),
-		list of incoming countries :: String (comma separated),
-		list of incoming populations :: String (comma separated),
-		list of case data :: String (comma separated),
-		date :: date
-		]
-	}
+	connectedness_data = [
+		hub_country :: String # This is the hub country
+		spoke_passengers :: Integer # Total number of passengers on route in last year
+		spoke_country :: String, # This is a spoke country
+		spoke_pop :: Integer, # This is the population of the spoke
+		spoke_confirmed_cases :: Integer, # Number of confirmed cases in spoke on date
+		date :: String, # Date of case data
+	]
 	"""
+	countries_query = "select name from countries;"
+	countries = [row[0] for row in c.execute(countries_query)]
 
-	# Compute case rates by dividing case counts by population
-	# We may want to experiment during the regression step with
-	# different ways of generating this number.
-	# Now we at least have something we can do regression on
-	X = []
-	# One row per country at a 
-	# TODO: Date
+	# Set up an accumulator for structuring data
+	acc = {}
+	with open("data/virus/case_series.json") as cases_json:
+		_, dates = json.load(cases_json)["labels"]
+	for date in dates:
+		acc[date] = {}
+		for country in countries:
+			# accumulate viral pressure here
+			acc[date][country] =  0
+	# Populate acc
+	# collect all data points from connectedness data
 	for row in connectedness_data:
-		incoming_countries = row[3].split(",")
-		incoming_populations = [int(num) for num in row[4].split(",")]
-		incoming_cases = [int(case) for case in row[5].split(",")]
-		# TODO: This is wrong!!
-		v_pressure = viral_pressure(incoming_cases, incoming_populations)
-		# TODO: remove; just did this because the viral pressure function isn't complete
-		# v_pressure = 1
-		new_row = [row[0], row[1], row[2], incoming_countries, incoming_populations, incoming_cases, v_pressure]
-		X.append(new_row)
+		hub_country, passengers, spoke_country, spoke_pop, spoke_confirmed_cases, cur_date = row
+		acc_viral_pressure = acc[cur_date][hub_country]
+		cur_viral_pressure = 1 # calc_viral_pressure(spoke_confirmed_cases, spoke_pop, passengers)
+		acc[cur_date][hub_country] = acc_viral_pressure + cur_viral_pressure
+		acc[cur_date][hub_country]
+	# print(acc["4/9/20"]["United States"])
+	# Use acc to calculate rows of X
+	# Transform acc back to a list
+	# NOTE: Feel free to get rid of this and work directly with acc
+	X = []
+	for date in dates:
+		for country in countries:
+			viral_pressure = acc[date][country]
+			X.append((date, country, viral_pressure))
 	return X
 
 
@@ -210,27 +226,28 @@ if __name__ == "__main__":
 	X = get_connectedness_data("data.db")
 	y = get_case_data("data.db")
 	# TODO: Collect y
+	print(X[10:0:-1])
 
-	(X, y) = pair_Xy(X, y)
+	# (X, y) = pair_Xy(X, y)
 
 
-	# Use train test split to split data into x_train, x_test, y_train, y_test #
-	(x_train, x_test, y_train, y_test) = train_test_split(X, y, p)
-	# print(type(x_train), type(x_test), type(y_train))
+	# # Use train test split to split data into x_train, x_test, y_train, y_test #
+	# (x_train, x_test, y_train, y_test) = train_test_split(X, y, p)
+	# # print(type(x_train), type(x_test), type(y_train))
 
-	# Use StatsModels to create the Linear Model and Output R-squared
-	x_train = sm.add_constant(x_train) # add a constant column to be intercept
-	model = sm.OLS(y_train, x_train)
-	results = model.fit()
-	print(results.summary())
+	# # Use StatsModels to create the Linear Model and Output R-squared
+	# x_train = sm.add_constant(x_train) # add a constant column to be intercept
+	# model = sm.OLS(y_train, x_train)
+	# results = model.fit()
+	# print(results.summary())
 
-	# Prints out a report containing
-	# R-squared, test MSE & train MSE
-	print(f"R2: {results.rsquared}")
-	training_mse = eval_measures.mse(y_train, results.predict(x_train))
-	print(f"Training MSE: {training_mse}")
-	x_test = sm.add_constant(x_test)
-	predicted_y_test = results.predict(x_test)
-	testing_mse = eval_measures.mse(y_test, predicted_y_test)
-	print(f"Testing MSE: {testing_mse}")
-	exit(0)
+	# # Prints out a report containing
+	# # R-squared, test MSE & train MSE
+	# print(f"R2: {results.rsquared}")
+	# training_mse = eval_measures.mse(y_train, results.predict(x_train))
+	# print(f"Training MSE: {training_mse}")
+	# x_test = sm.add_constant(x_test)
+	# predicted_y_test = results.predict(x_test)
+	# testing_mse = eval_measures.mse(y_test, predicted_y_test)
+	# print(f"Testing MSE: {testing_mse}")
+	# exit(0)
