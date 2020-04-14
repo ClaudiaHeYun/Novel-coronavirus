@@ -9,6 +9,7 @@ import statsmodels.api as sm
 from statsmodels.tools import eval_measures
 import statsmodels.formula.api as smf
 from datetime import date
+import pprint
 
 
 def pressure_as_cases_per_pop_times_traffic_volume(*args):
@@ -103,7 +104,7 @@ def get_connectedness_data(db_location):
 	for row in connectedness_data:
 		hub_country, passengers, spoke_country, spoke_pop, spoke_confirmed_cases, cur_date = row
 		acc_viral_pressure = acc[cur_date][hub_country]
-		cur_viral_pressure = 1 # calc_viral_pressure(spoke_confirmed_cases, spoke_pop, passengers)
+		cur_viral_pressure = calc_viral_pressure(spoke_confirmed_cases, spoke_pop, passengers)
 		acc[cur_date][hub_country] = acc_viral_pressure + cur_viral_pressure
 		acc[cur_date][hub_country]
 	# print(acc["4/9/20"]["United States"])
@@ -226,7 +227,9 @@ if __name__ == "__main__":
 	X = get_connectedness_data("data.db")
 	y = get_case_data("data.db")
 	# TODO: Collect y
-	print(X[10:0:-1])
+	pp = pprint.PrettyPrinter(indent=4)
+	# Print out all countries for each date where viral pressure is not 0
+	pp.pprint([x for x in X if x[2] != 0])
 
 	# (X, y) = pair_Xy(X, y)
 
