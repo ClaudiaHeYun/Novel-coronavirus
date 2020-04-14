@@ -193,7 +193,6 @@ def get_case_data(db_location):
 			y[i][2] = days
 			days += 1
 		i -= 1
-
 	return y
 
 def pair_Xy(X, y):
@@ -207,6 +206,20 @@ def pair_Xy(X, y):
 				X_paired.append(X_row[:-1])
 				break
 	return X_paired, y_paired
+
+def add_missing(countries, y, default):
+	days = [y[0][0]]
+	for row in y[1:]:
+		if row[1] == days[0]:
+			break
+		else:
+			days.append(row[1])
+
+	print(days)
+	for country in countries:
+		for day in days:
+			y.append([country, day, default])
+	return y
 
 # Goal data spec for running regressions
 # X_all = [Country :: String, Date :: Date, Viral pressure :: Float]
@@ -254,6 +267,34 @@ if __name__ == "__main__":
 	# TODO: This is cheating and produces garbage
 	x_sorted_pressure = [x[2] for x in x_sorted]
 	y_sorted_days = [y[2] for y in y_sorted]
+
+	# test_x, test_y = pair_Xy(x_sorted, y_sorted)
+
+	# rem_x_sorted = filter(lambda x: x[0] != 'American Samoa', x_sorted)
+	# rem_x_sorted = filter(lambda x: x[0] != 'Anguilla', rem_x_sorted)
+	# rem_x_sorted = filter(lambda x: x[0] != 'Aruba', rem_x_sorted)
+
+	# print(x_sorted[0][1])
+	# print(y_sorted[0][1])
+	caseless_countries = ['American Samoa']
+	extra_entries = []
+	for x in x_sorted:
+		matched = False
+		for y in y_sorted:
+			if (x[0] == y[0]):
+				matched = True
+				break
+		if not matched:
+			# print(x[0])
+			if not caseless_countries[-1] == x[0]:
+				caseless_countries.append(x[0])
+				print(x[0])
+			extra_entries.append(x)
+
+	# y = add_missing(missing_countries, )
+	# print(test_x)
+	# print(test_y)
+
 	# TODO: X and y are different lengths which means we've got a problem
 	plt.scatter(x_sorted_pressure, y_sorted_days)
 	plt.ylabel("Days to infection")
@@ -277,13 +318,13 @@ if __name__ == "__main__":
 	# (X, y) = pair_Xy(X, y)
 
 	# Use train test split to split data into x_train, x_test, y_train, y_test #
-	# (x_train, x_test, y_train, y_test) = train_test_split(X, y, p)
+	# (x_train, x_test, y_train, y_test) = train_test_split(x_sorted_pressure, y_sorted_days, p)
 	# print(type(x_train), type(x_test), type(y_train))
 
 	# Use StatsModels to create the Linear Model and Output R-squared
-	model = sm.OLS(x_sorted_pressure, y_sorted_days)
-	results = model.fit()
-	print(results.summary())
+	# model = sm.OLS(x_sorted_pressure, y_sorted_days)
+	# results = model.fit()
+	# print(results.summary())
 
 	# Prints out a report containing
 	# R-squared, test MSE & train MSE
