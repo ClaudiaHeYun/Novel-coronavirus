@@ -207,7 +207,23 @@ def pair_Xy(X, y):
 				break
 	return X_paired, y_paired
 
-def add_missing(countries, y, default):
+def add_missing(countries, x_sorted, y, default):
+
+	# caseless_countries = ['American Samoa']
+	# extra_entries = []
+	# for x in x_sorted:
+	# 	matched = False
+	# 	for y in y_sorted:
+	# 		if (x[0] == y[0]):
+	# 			matched = True
+	# 			break
+	# 	if not matched:
+	# 		# print(x[0])
+	# 		if not caseless_countries[-1] == x[0]:
+	# 			caseless_countries.append(x[0])
+	# 			print(x[0])
+	# 		extra_entries.append(x)
+
 	days = [y[0][0]]
 	for row in y[1:]:
 		if row[1] == days[0]:
@@ -264,47 +280,31 @@ if __name__ == "__main__":
 	print(len(X), len(y))
 	x_sorted = sorted(X, key=lambda x: x[0] + x[1])
 	y_sorted = sorted(y, key=lambda x: x[0] + x[1])
-	# TODO: This is cheating and produces garbage
+
 	x_sorted_pressure = [x[2] for x in x_sorted]
 	y_sorted_days = [y[2] for y in y_sorted]
 
-	# test_x, test_y = pair_Xy(x_sorted, y_sorted)
 
-	# rem_x_sorted = filter(lambda x: x[0] != 'American Samoa', x_sorted)
-	# rem_x_sorted = filter(lambda x: x[0] != 'Anguilla', rem_x_sorted)
-	# rem_x_sorted = filter(lambda x: x[0] != 'Aruba', rem_x_sorted)
+	# Things to finish up today/tomorrow:
+	# TODO: train test split I guess?
 
-	# print(x_sorted[0][1])
-	# print(y_sorted[0][1])
-	caseless_countries = ['American Samoa']
-	extra_entries = []
-	for x in x_sorted:
-		matched = False
-		for y in y_sorted:
-			if (x[0] == y[0]):
-				matched = True
-				break
-		if not matched:
-			# print(x[0])
-			if not caseless_countries[-1] == x[0]:
-				caseless_countries.append(x[0])
-				print(x[0])
-			extra_entries.append(x)
-
-	# y = add_missing(missing_countries, )
-	# print(test_x)
-	# print(test_y)
+	# Things we could do after this deliverable?
+	# TODO: split by days, run a regression for each I guess?
+	# TODO: different viral pressure metrics
+		# 1. Try not weighting by population
+		# 2. Try different ways of measuring days to infection (once infected, just n?)
+	# TODO: try running with only the nonzero x values
 
 	# TODO: X and y are different lengths which means we've got a problem
 	plt.scatter(x_sorted_pressure, y_sorted_days)
 	plt.ylabel("Days to infection")
 	plt.xlabel("Viral pressure")
 	plt.savefig("results/full_scatter.png")
+	plt.clf()
 	# pp.pprint(y)
 	# TODO: Collect y
 	# Print out all countries for each date where viral pressure is not 0
 	nonzero_x = [x for x in X if x[2] != 0]
-	# pp.pprint(nonzero_x)
 	print("Total rows in X:", len(X))
 	print("Total nonzero rows in X:", len(nonzero_x))
 	rows_sorted_by_pressure = sorted(nonzero_x, key=lambda x: x[2], reverse=True)
@@ -322,9 +322,9 @@ if __name__ == "__main__":
 	# print(type(x_train), type(x_test), type(y_train))
 
 	# Use StatsModels to create the Linear Model and Output R-squared
-	# model = sm.OLS(x_sorted_pressure, y_sorted_days)
-	# results = model.fit()
-	# print(results.summary())
+	model = sm.OLS(x_sorted_pressure, y_sorted_days)
+	results = model.fit()
+	print(results.summary())
 
 	# Prints out a report containing
 	# R-squared, test MSE & train MSE
@@ -336,7 +336,3 @@ if __name__ == "__main__":
 	# testing_mse = eval_measures.mse(y_test, predicted_y_test)
 	# print(f"Testing MSE: {testing_mse}")
 	# exit(0)
-
-# 1. Try not weighting by population
-# 2. Try different days to infection. n....0....-n. n......0,0,0,0, 1/n
-# 3. Deal with outliers: Cut zero viral pressure rows from X and then run regression
