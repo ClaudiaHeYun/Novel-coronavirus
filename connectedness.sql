@@ -1,4 +1,4 @@
--- TODO: I'm not great at SQL so I'm not totally sure if this does what we want
+
 select
 	connections.arrival_country,
 	connections.passengers,
@@ -11,11 +11,15 @@ from (
 		(
 			select airports.country
 			from airports
+			join (select country from cases) as case_country
+			on case_country.country = airports.country
 			where airports.iata = departure_code
 		) as departure_country,
 		(
 			select airports.country
 			from airports
+			join (select country from cases) as case_country
+			on case_country.country = airports.country
 			where airports.iata = arrival_code
 		) as arrival_country
 	from (
@@ -24,7 +28,7 @@ from (
 		join airports as a
 		on a.iata = t.departure_code
 	)
- ) as connections
+) as connections
 join (
 	select ca.date, ca.country, ca.confirmed, co.population
 	from cases as ca

@@ -5,7 +5,7 @@ import random
 import csv
 import matplotlib.pyplot as plt
 import json
-from scipy import stats
+from scipy import stats 
 import statsmodels.api as sm
 from statsmodels.tools import eval_measures
 import statsmodels.formula.api as smf
@@ -50,11 +50,15 @@ def get_connectedness_data(db_location):
 			(
 				select airports.country
 				from airports
+				join (select country from cases) as case_country
+				on case_country.country = airports.country
 				where airports.iata = departure_code
 			) as departure_country,
 			(
 				select airports.country
 				from airports
+				join (select country from cases) as case_country
+				on case_country.country = airports.country
 				where airports.iata = arrival_code
 			) as arrival_country
 		from (
@@ -72,6 +76,7 @@ def get_connectedness_data(db_location):
 	) as case_data
 	on case_data.country = connections.departure_country
 	where arrival_country != departure_country -- only international flights
+	;
 	"""
 	# Join case data and route data on country
 	# We now have a time series of cases of over time matched with
@@ -88,7 +93,7 @@ def get_connectedness_data(db_location):
 		date :: String, # Date of case data
 	]
 	"""
-	countries_query = "select name from countries;"
+	countries_query = "select country from cases"
 	countries = [row[0] for row in c.execute(countries_query)]
 	conn.close()
 
@@ -116,7 +121,7 @@ def flatten_data(data):
 	"""Flatten x into an array of tuples"""
 	conn = sqlite3.connect("data.db")
 	c = conn.cursor()
-	countries_query = "select name from countries;"
+	countries_query = "select country from cases group by country;"
 	countries = [row[0] for row in c.execute(countries_query)]
 	conn.close()
 
@@ -246,13 +251,14 @@ if __name__ == "__main__":
 	print(len(X), len(y))
 	x_sorted = sorted(X, key=lambda x: x[0] + x[1])
 	y_sorted = sorted(y, key=lambda x: x[0] + x[1])
-	x_sorted_pressure = [x[2] for x in x_sorted][:15170]
+	# TODO: This is cheating and produces garbage
+	x_sorted_pressure = [x[2] for x in x_sorted]
 	y_sorted_days = [y[2] for y in y_sorted]
 	# TODO: X and y are different lengths which means we've got a problem
-	# plt.scatter(x_sorted_pressure, y_sorted_days)
-	# plt.ylabel("Days to infection")
-	# plt.xlabel("Viral pressure")
-	# plt.savefig("results/full_scatter.png")
+	plt.scatter(x_sorted_pressure, y_sorted_days)
+	plt.ylabel("Days to infection")
+	plt.xlabel("Viral pressure")
+	plt.savefig("results/full_scatter.png")
 	# pp.pprint(y)
 	# TODO: Collect y
 	# Print out all countries for each date where viral pressure is not 0
@@ -264,7 +270,7 @@ if __name__ == "__main__":
 	print("Top 10 rows by viral pressure:")
 	pp.pprint(rows_sorted_by_pressure[:10])
 
-	plt.hist([x[2] for x in nonzero_x], range=(5, 1000))
+	plt.hist([x[2] for x in nonzero_x])
 	plt.ylabel("Viral Pressure")
 	plt.savefig("results/viral_pressure.png")
 
