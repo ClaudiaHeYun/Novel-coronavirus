@@ -15,6 +15,8 @@ def parse_row(row):
 	lon = float(lon)
 	if country == "US":
 		country = "United States"
+	if country == "Taiwan*":
+		country = "Taiwan"
 	daily_totals = [int(total) for total in daily_totals]
 	return (country, daily_totals)
 
