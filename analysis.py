@@ -117,7 +117,7 @@ def get_connectedness_data(db_location):
 	for date in dates:
 		for country in countries:
 			viral_pressure = acc[date][country]
-			X.append((date, country, viral_pressure))
+			X.append((country, date, viral_pressure))
 	return X
 
 
@@ -192,8 +192,8 @@ def pair_Xy(X, y):
 	return X_paired, y_paired
 
 # Goal data spec for running regressions
-# X_all = [Date :: Date, Country :: String, Viral pressure :: Float]
-# Y_all = [Date :: Date, Country :: String, Days to infection :: Integer]
+# X_all = [Country :: String, Date :: Date, Viral pressure :: Float]
+# Y_all = [Country :: String, Date :: Date, Days to infection :: Integer]
 # Train test split on countries X_i
 
 # Evan's TODO:
@@ -225,11 +225,24 @@ def train_test_split(x, y, test_pct):
 	return (x_train, x_test, y_train, y_test)
 
 if __name__ == "__main__":
+	pp = pprint.PrettyPrinter()
 	p = 0.2
 	X = get_connectedness_data("data.db")
 	y = get_case_data("data.db")
+
+	# Get X and y in same order
+	print(len(X), len(y))
+	x_sorted = sorted(X, key=lambda x: x[0] + x[1])
+	y_sorted = sorted(y, key=lambda x: x[0] + x[1])
+	x_sorted_pressure = [x[2] for x in x_sorted]
+	y_sorted_days = [y[2] for y in y_sorted]
+	# TODO: X and y are different lengths which means we've got a problem
+	# plt.scatter(x_sorted_pressure, y_sorted_days)
+	# plt.ylabel("Days to infection")
+	# plt.xlabel("Viral pressure")
+	# plt.savefig("results/full_scatter.png")
+	# pp.pprint(y)
 	# TODO: Collect y
-	pp = pprint.PrettyPrinter()
 	# Print out all countries for each date where viral pressure is not 0
 	nonzero_x = [x for x in X if x[2] != 0]
 	# pp.pprint(nonzero_x)
