@@ -90,33 +90,45 @@ def get_connectedness_data(db_location):
 	"""
 	countries_query = "select name from countries;"
 	countries = [row[0] for row in c.execute(countries_query)]
+	conn.close()
 
 	# Set up an accumulator for structuring data
-	acc = {}
+	data = {}
 	with open("data/virus/case_series.json") as cases_json:
 		_, dates = json.load(cases_json)["labels"]
 	for date in dates:
-		acc[date] = {}
+		data[date] = {}
 		for country in countries:
 			# accumulate viral pressure here
-			acc[date][country] =  0
+			data[date][country] =  0
 	
-	# Populate acc
+	# Populate data
 	# collect all data points from connectedness data
 	for row in connectedness_data:
 		hub_country, passengers, spoke_country, spoke_pop, spoke_confirmed_cases, cur_date = row
-		acc_viral_pressure = acc[cur_date][hub_country]
+		acc_viral_pressure = data[cur_date][hub_country]
 		cur_viral_pressure = calc_viral_pressure(spoke_confirmed_cases, spoke_pop, passengers)
-		acc[cur_date][hub_country] = acc_viral_pressure + cur_viral_pressure
-		acc[cur_date][hub_country]
+		data[cur_date][hub_country] = acc_viral_pressure + cur_viral_pressure
+		data[cur_date][hub_country]
+	return data
 
-	# Use acc to calculate rows of X
+def flatten_data(data):
+	"""Flatten x into an array of tuples"""
+	conn = sqlite3.connect("data.db")
+	c = conn.cursor()
+	countries_query = "select name from countries;"
+	countries = [row[0] for row in c.execute(countries_query)]
+	conn.close()
+
+	with open("data/virus/case_series.json") as cases_json:
+		_, dates = json.load(cases_json)["labels"]
+		# Use acc to calculate rows of X
 	# Transform acc back to a list
 	# NOTE: Feel free to get rid of this and work directly with acc
 	X = []
 	for date in dates:
 		for country in countries:
-			viral_pressure = acc[date][country]
+			viral_pressure = data[date][country]
 			X.append((country, date, viral_pressure))
 	return X
 
@@ -227,7 +239,7 @@ def train_test_split(x, y, test_pct):
 if __name__ == "__main__":
 	pp = pprint.PrettyPrinter()
 	p = 0.2
-	X = get_connectedness_data("data.db")
+	X = flatten_data(get_connectedness_data("data.db"))
 	y = get_case_data("data.db")
 
 	# Get X and y in same order
