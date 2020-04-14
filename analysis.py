@@ -99,6 +99,7 @@ def get_connectedness_data(db_location):
 		for country in countries:
 			# accumulate viral pressure here
 			acc[date][country] =  0
+	
 	# Populate acc
 	# collect all data points from connectedness data
 	for row in connectedness_data:
@@ -107,7 +108,7 @@ def get_connectedness_data(db_location):
 		cur_viral_pressure = calc_viral_pressure(spoke_confirmed_cases, spoke_pop, passengers)
 		acc[cur_date][hub_country] = acc_viral_pressure + cur_viral_pressure
 		acc[cur_date][hub_country]
-	# print(acc["4/9/20"]["United States"])
+
 	# Use acc to calculate rows of X
 	# Transform acc back to a list
 	# NOTE: Feel free to get rid of this and work directly with acc
