@@ -95,7 +95,7 @@ def get_connectedness_data(db_location):
 	# Set up an accumulator for structuring data
 	data = {}
 	with open("data/virus/case_series.json") as cases_json:
-		_, dates = json.load(cases_json)["labels"]
+		_, _, dates = json.load(cases_json)["labels"]
 	for date in dates:
 		data[date] = {}
 		for country in countries:
@@ -106,6 +106,7 @@ def get_connectedness_data(db_location):
 	# collect all data points from connectedness data
 	for row in connectedness_data:
 		hub_country, passengers, spoke_country, spoke_pop, spoke_confirmed_cases, cur_date = row
+		print(data.keys())
 		acc_viral_pressure = data[cur_date][hub_country]
 		cur_viral_pressure = calc_viral_pressure(spoke_confirmed_cases, spoke_pop, passengers)
 		data[cur_date][hub_country] = acc_viral_pressure + cur_viral_pressure
@@ -121,7 +122,7 @@ def flatten_data(data):
 	conn.close()
 
 	with open("data/virus/case_series.json") as cases_json:
-		_, dates = json.load(cases_json)["labels"]
+		_, _, dates = json.load(cases_json)["labels"]
 		# Use acc to calculate rows of X
 	# Transform acc back to a list
 	# NOTE: Feel free to get rid of this and work directly with acc
@@ -248,6 +249,8 @@ if __name__ == "__main__":
 	y_sorted = sorted(y, key=lambda x: x[0] + x[1])
 	x_sorted_pressure = [x[2] for x in x_sorted][:15170]
 	y_sorted_days = [y[2] for y in y_sorted]
+	print(x_sorted[0])
+	print(y_sorted[0])
 	# TODO: X and y are different lengths which means we've got a problem
 	# plt.scatter(x_sorted_pressure, y_sorted_days)
 	# plt.ylabel("Days to infection")
@@ -271,7 +274,7 @@ if __name__ == "__main__":
 	# (X, y) = pair_Xy(X, y)
 
 	# Use train test split to split data into x_train, x_test, y_train, y_test #
-	# (x_train, x_test, y_train, y_test) = train_test_split(X, y, p)
+	# (x_train, x_test, y_train, y_test) = train_test_split(x_sorted_pressure, y_sorted_days, p)
 	# print(type(x_train), type(x_test), type(y_train))
 
 	# Use StatsModels to create the Linear Model and Output R-squared
