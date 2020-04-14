@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import random
 import csv
+import matplotlib.pyplot as plt
 import json
 from scipy import stats
 import statsmodels.api as sm
@@ -228,12 +229,21 @@ if __name__ == "__main__":
 	X = get_connectedness_data("data.db")
 	y = get_case_data("data.db")
 	# TODO: Collect y
-	pp = pprint.PrettyPrinter(indent=4)
+	pp = pprint.PrettyPrinter()
 	# Print out all countries for each date where viral pressure is not 0
-	pp.pprint([x for x in X if x[2] != 0])
+	nonzero_x = [x for x in X if x[2] != 0]
+	# pp.pprint(nonzero_x)
+	print("Total rows in X:", len(X))
+	print("Total nonzero rows in X:", len(nonzero_x))
+	rows_sorted_by_pressure = sorted(nonzero_x, key=lambda x: x[2], reverse=True)
+	print("Top 10 rows by viral pressure:")
+	pp.pprint(rows_sorted_by_pressure[:10])
+
+	plt.hist([x[2] for x in nonzero_x], range=(5, 1000))
+	plt.ylabel("Viral Pressure")
+	plt.savefig("results/viral_pressure.png")
 
 	# (X, y) = pair_Xy(X, y)
-
 
 	# # Use train test split to split data into x_train, x_test, y_train, y_test #
 	# (x_train, x_test, y_train, y_test) = train_test_split(X, y, p)
