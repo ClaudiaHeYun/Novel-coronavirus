@@ -95,7 +95,7 @@ def get_connectedness_data(db_location):
 	# Set up an accumulator for structuring data
 	data = {}
 	with open("data/virus/case_series.json") as cases_json:
-		_, _, dates = json.load(cases_json)["labels"]
+		_, dates = json.load(cases_json)["labels"]
 	for date in dates:
 		data[date] = {}
 		for country in countries:
@@ -122,7 +122,7 @@ def flatten_data(data):
 	conn.close()
 
 	with open("data/virus/case_series.json") as cases_json:
-		_, _, dates = json.load(cases_json)["labels"]
+		_, dates = json.load(cases_json)["labels"]
 		# Use acc to calculate rows of X
 	# Transform acc back to a list
 	# NOTE: Feel free to get rid of this and work directly with acc
