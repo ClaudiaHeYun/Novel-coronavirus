@@ -336,3 +336,7 @@ if __name__ == "__main__":
 	# testing_mse = eval_measures.mse(y_test, predicted_y_test)
 	# print(f"Testing MSE: {testing_mse}")
 	# exit(0)
+
+# 1. Try not weighting by population
+# 2. Try different days to infection. n....0....-n. n......0,0,0,0, 1/n
+# 3. Deal with outliers: Cut zero viral pressure rows from X and then run regression
