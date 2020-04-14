@@ -234,7 +234,7 @@ if __name__ == "__main__":
 	print(len(X), len(y))
 	x_sorted = sorted(X, key=lambda x: x[0] + x[1])
 	y_sorted = sorted(y, key=lambda x: x[0] + x[1])
-	x_sorted_pressure = [x[2] for x in x_sorted]
+	x_sorted_pressure = [x[2] for x in x_sorted][:15170]
 	y_sorted_days = [y[2] for y in y_sorted]
 	# TODO: X and y are different lengths which means we've got a problem
 	# plt.scatter(x_sorted_pressure, y_sorted_days)
@@ -258,18 +258,17 @@ if __name__ == "__main__":
 
 	# (X, y) = pair_Xy(X, y)
 
-	# # Use train test split to split data into x_train, x_test, y_train, y_test #
+	# Use train test split to split data into x_train, x_test, y_train, y_test #
 	# (x_train, x_test, y_train, y_test) = train_test_split(X, y, p)
-	# # print(type(x_train), type(x_test), type(y_train))
+	# print(type(x_train), type(x_test), type(y_train))
 
-	# # Use StatsModels to create the Linear Model and Output R-squared
-	# x_train = sm.add_constant(x_train) # add a constant column to be intercept
-	# model = sm.OLS(y_train, x_train)
-	# results = model.fit()
-	# print(results.summary())
+	# Use StatsModels to create the Linear Model and Output R-squared
+	model = sm.OLS(x_sorted_pressure, y_sorted_days)
+	results = model.fit()
+	print(results.summary())
 
-	# # Prints out a report containing
-	# # R-squared, test MSE & train MSE
+	# Prints out a report containing
+	# R-squared, test MSE & train MSE
 	# print(f"R2: {results.rsquared}")
 	# training_mse = eval_measures.mse(y_train, results.predict(x_train))
 	# print(f"Training MSE: {training_mse}")
