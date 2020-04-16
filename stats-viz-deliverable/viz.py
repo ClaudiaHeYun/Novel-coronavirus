@@ -54,7 +54,7 @@ def plot_time_series_all_countries(df, x_values, y_values, countries):
 
 if __name__ == "__main__":
     # Reads in data from analysis.py
-    data = get_connectedness_data("data.db")
+    data = get_connectedness_data("../data.db")
     # Converts data from dictionary to dataframe
     df = get_data_as_dataframe(data) 
     # Removes columns with only 0s 

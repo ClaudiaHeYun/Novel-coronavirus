@@ -121,7 +121,7 @@ def get_connectedness_data(db_location):
 
 def flatten_data(data):
 	"""Flatten x into an array of tuples"""
-	conn = sqlite3.connect("data.db")
+	conn = sqlite3.connect("../data.db")
 	c = conn.cursor()
 	countries_query = "select country from cases group by country;"
 	countries = [row[0] for row in c.execute(countries_query)]
@@ -244,14 +244,6 @@ def process_y(case_data):
 # Y_all = [Country :: String, Date :: Date, Days to infection :: Integer]
 # Train test split on countries X_i
 
-# Evan's TODO:
-# 1. Wire up the regression
-# 2. Double check code for gettting Y_all
-# 3. Test on fake data
-
-# Quinn's TODO:
-# 1. Get connectedness data
-
 def aggregated_analysis(file_path):
 	X = flatten_data(get_connectedness_data(file_path))
 	y = process_y(get_case_data(file_path))
@@ -362,7 +354,7 @@ def train_test_split(x, y, test_pct):
 if __name__ == "__main__":
 	pp = pprint.PrettyPrinter()
 	p = 0.2
-	data_file = "data.db"
+	data_file = "../data.db"
 
 	daily_analysis(data_file)	
 	# aggregated_analysis(data_file)
