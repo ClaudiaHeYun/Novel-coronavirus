@@ -11,6 +11,7 @@ pandas = "*"
 statsmodels = "*"
 requests = "*"
 matplotlib = "*"
+plotly = "*"
 
 [requires]
 python_version = "3.8"

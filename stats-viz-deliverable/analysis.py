@@ -13,6 +13,7 @@ import statsmodels.formula.api as smf
 from datetime import date
 import pprint
 
+DATA = "../data"
 
 def pressure_as_cases_per_pop_times_traffic_volume(*args):
 	# TODO: Normalize this data!
@@ -100,7 +101,7 @@ def get_connectedness_data(db_location):
 
 	# Set up an accumulator for structuring data
 	data = {}
-	with open("data/virus/case_series.json") as cases_json:
+	with open(f"{DATA}/virus/case_series.json") as cases_json:
 		_, dates = json.load(cases_json)["labels"]
 	for date in dates:
 		data[date] = {}
@@ -127,7 +128,7 @@ def flatten_data(data):
 	countries = [row[0] for row in c.execute(countries_query)]
 	conn.close()
 
-	with open("data/virus/case_series.json") as cases_json:
+	with open(f"{DATA}/virus/case_series.json") as cases_json:
 		_, dates = json.load(cases_json)["labels"]
 		# Use acc to calculate rows of X
 	# Transform acc back to a list
