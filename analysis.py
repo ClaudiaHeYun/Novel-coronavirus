@@ -4,6 +4,7 @@ import pandas as pd
 import random
 import csv
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 import json
 from scipy import stats 
 import statsmodels.api as sm
@@ -115,6 +116,7 @@ def get_connectedness_data(db_location):
 		cur_viral_pressure = calc_viral_pressure(spoke_confirmed_cases, spoke_pop, passengers)
 		data[cur_date][hub_country] = acc_viral_pressure + cur_viral_pressure
 		data[cur_date][hub_country]
+
 	return data
 
 def flatten_data(data):
@@ -159,8 +161,11 @@ def get_case_data(db_location):
 		number of confirmed cases :: Integer
 	}
 	"""
-	# there's definitely a better way to do this
+	return case_data
 
+
+def process_y(case_data):
+	# there's definitely a better way to do this
 	y = []
 	"""
 	y = {
@@ -195,47 +200,44 @@ def get_case_data(db_location):
 		i -= 1
 	return y
 
-def pair_Xy(X, y):
-	y_paired = []
-	X_paired = []
-	for X_row in X:
-		for y_row in y:
-			if X_row[2] == y_row[0] and X_row[-1] == y_row[1]:
-				X_row.pop(2)
-				y_paired.append(y_row[2])
-				X_paired.append(X_row[:-1])
-				break
-	return X_paired, y_paired
+# def add_missing(countries, x_sorted, y, default):
 
-def add_missing(countries, x_sorted, y, default):
+# 	# caseless_countries = ['American Samoa']
+# 	# extra_entries = []
+# 	# for x in x_sorted:
+# 	# 	matched = False
+# 	# 	for y in y_sorted:
+# 	# 		if (x[0] == y[0]):
+# 	# 			matched = True
+# 	# 			break
+# 	# 	if not matched:
+# 	# 		# print(x[0])
+# 	# 		if not caseless_countries[-1] == x[0]:
+# 	# 			caseless_countries.append(x[0])
+# 	# 			print(x[0])
+# 	# 		extra_entries.append(x)
 
-	# caseless_countries = ['American Samoa']
-	# extra_entries = []
-	# for x in x_sorted:
-	# 	matched = False
-	# 	for y in y_sorted:
-	# 		if (x[0] == y[0]):
-	# 			matched = True
-	# 			break
-	# 	if not matched:
-	# 		# print(x[0])
-	# 		if not caseless_countries[-1] == x[0]:
-	# 			caseless_countries.append(x[0])
-	# 			print(x[0])
-	# 		extra_entries.append(x)
+# 	days = [y_sorted[0][1]]
+# 	for row in y[1:]:
+# 		if row[1] == days[0]:
+# 			break
+# 		else:
+# 			days.append(row[1])
 
-	days = [y[0][0]]
-	for row in y[1:]:
-		if row[1] == days[0]:
-			break
-		else:
-			days.append(row[1])
+# 	print(days)
+# 	for country in countries:
+# 		for day in days:
+# 			y.append([country, day, default])
+# 	return y
 
-	print(days)
-	for country in countries:
-		for day in days:
-			y.append([country, day, default])
-	return y
+# def get_days(sorted_country_day):
+# 	days = [sorted[0][1]]
+# 	for row in y[1:]:
+# 		if row[1] == days[0]:
+# 			break
+# 		else:
+# 			days.append(row[1])
+# 	return len(days), days
 
 # Goal data spec for running regressions
 # X_all = [Country :: String, Date :: Date, Viral pressure :: Float]
@@ -249,6 +251,82 @@ def add_missing(countries, x_sorted, y, default):
 
 # Quinn's TODO:
 # 1. Get connectedness data
+
+def aggregated_analysis(file_path):
+	X = flatten_data(get_connectedness_data(file_path))
+	y = process_y(get_case_data(file_path))
+
+	x_sorted = sorted(X, key=lambda x: x[1] + x[0])
+	y_sorted = sorted(y, key=lambda x: x[1] + x[0])	
+	x_sorted_pressure = [x[2] for x in x_sorted]
+	y_sorted_days = [y[2] for y in y_sorted]
+
+	plt.scatter(x_sorted_pressure, y_sorted_days)
+	plt.ylabel("Days to infection")
+	plt.xlabel("Viral pressure")
+	plt.savefig("results/full_scatter.png")
+	plt.clf()
+
+	# Print out all countries for each date where viral pressure is not 0
+	nonzero_x = [x for x in X if x[2] != 0]
+	# print("Total rows in X:", len(X))
+	# print("Total nonzero rows in X:", len(nonzero_x))
+	# rows_sorted_by_pressure = sorted(nonzero_x, key=lambda x: x[2], reverse=True)
+	# print("Top 10 rows by viral pressure:")
+	# pp.pprint(rows_sorted_by_pressure[:10])
+
+	plt.hist([x[2] for x in nonzero_x])
+	plt.ylabel("Viral Pressure")
+	plt.savefig("results/viral_pressure.png")
+
+	# Use train test split to split data into x_train, x_test, y_train, y_test #
+	# (x_train, x_test, y_train, y_test) = train_test_split(x_sorted_pressure, y_sorted_days, p)
+	# print(type(x_train), type(x_test), type(y_train))
+
+	# Use StatsModels to create the Linear Model and Output R-squared
+	model = sm.OLS(x_sorted_pressure, y_sorted_days)
+	results = model.fit()
+	print(results.summary())
+
+def daily_analysis(file_path):
+	X = get_connectedness_data(file_path)
+	y = process_y(get_case_data(file_path))
+
+	for (country, date, val) in y:
+		X[date][country] = (X[date][country], val)
+
+	daily_results = {}	
+	for (date, data) in X.items():
+		# _, data = daily_data
+		[x_pressure, y_days] = zip(*data.values())
+		model = sm.OLS(x_pressure, y_days)
+		results = model.fit()
+		training_mse = eval_measures.mse(y_days, results.predict(y_days))
+		daily_results[date] = (training_mse, results.rsquared)
+		
+	[mse, rsquared] = zip(*daily_results.values())
+
+	# dates = daily_results.keys()
+	dates = [pd.to_datetime(d) for d in daily_results.keys()]
+
+	ax = plt.gca()
+	ax.xaxis.set_major_formatter(mdates.DateFormatter("%m-%d"))
+	# plt.scatter(dates, mse)	
+	plt.plot_date(dates, mse)	
+	plt.ylabel("MSE")
+	plt.xlabel("Date")
+	plt.savefig("results/MSE_daily_scatter.png")
+	plt.clf()
+
+	ax = plt.gca()
+	ax.xaxis.set_major_formatter(mdates.DateFormatter("%m-%d"))
+	# plt.scatter(dates, rsquared)
+	plt.plot_date(dates, rsquared)
+	plt.ylabel("R-Squared")
+	plt.xlabel("Date")
+	plt.savefig("results/R_Squared_daily_scatter.png")
+	plt.clf()
+
 
 # NOTE: Everything below here is just copy-pasted from multiple-regression.py
 def train_test_split(x, y, test_pct):
@@ -270,61 +348,24 @@ def train_test_split(x, y, test_pct):
 	y_train = np.array([y[i] for i in train_indices])
 	return (x_train, x_test, y_train, y_test)
 
+
+# Things to finish up today/tomorrow:
+# TODO: train test split I guess?
+
+# Things we could do after this deliverable?
+# TODO: split by days, run a regression for each I guess?
+# TODO: different viral pressure metrics
+	# 1. Try not weighting by population
+	# 2. Try different ways of measuring days to infection (once infected, just n?)
+# TODO: try running with only the nonzero x values
+
 if __name__ == "__main__":
 	pp = pprint.PrettyPrinter()
 	p = 0.2
-	X = flatten_data(get_connectedness_data("data.db"))
-	y = get_case_data("data.db")
+	data_file = "data.db"
 
-	# Get X and y in same order
-	print(len(X), len(y))
-	x_sorted = sorted(X, key=lambda x: x[0] + x[1])
-	y_sorted = sorted(y, key=lambda x: x[0] + x[1])
-
-	x_sorted_pressure = [x[2] for x in x_sorted]
-	y_sorted_days = [y[2] for y in y_sorted]
-
-
-	# Things to finish up today/tomorrow:
-	# TODO: train test split I guess?
-
-	# Things we could do after this deliverable?
-	# TODO: split by days, run a regression for each I guess?
-	# TODO: different viral pressure metrics
-		# 1. Try not weighting by population
-		# 2. Try different ways of measuring days to infection (once infected, just n?)
-	# TODO: try running with only the nonzero x values
-
-	# TODO: X and y are different lengths which means we've got a problem
-	plt.scatter(x_sorted_pressure, y_sorted_days)
-	plt.ylabel("Days to infection")
-	plt.xlabel("Viral pressure")
-	plt.savefig("results/full_scatter.png")
-	plt.clf()
-	# pp.pprint(y)
-	# TODO: Collect y
-	# Print out all countries for each date where viral pressure is not 0
-	nonzero_x = [x for x in X if x[2] != 0]
-	print("Total rows in X:", len(X))
-	print("Total nonzero rows in X:", len(nonzero_x))
-	rows_sorted_by_pressure = sorted(nonzero_x, key=lambda x: x[2], reverse=True)
-	print("Top 10 rows by viral pressure:")
-	pp.pprint(rows_sorted_by_pressure[:10])
-
-	plt.hist([x[2] for x in nonzero_x])
-	plt.ylabel("Viral Pressure")
-	plt.savefig("results/viral_pressure.png")
-
-	# (X, y) = pair_Xy(X, y)
-
-	# Use train test split to split data into x_train, x_test, y_train, y_test #
-	# (x_train, x_test, y_train, y_test) = train_test_split(x_sorted_pressure, y_sorted_days, p)
-	# print(type(x_train), type(x_test), type(y_train))
-
-	# Use StatsModels to create the Linear Model and Output R-squared
-	model = sm.OLS(x_sorted_pressure, y_sorted_days)
-	results = model.fit()
-	print(results.summary())
+	daily_analysis(data_file)	
+	# aggregated_analysis(data_file)
 
 	# Prints out a report containing
 	# R-squared, test MSE & train MSE
