@@ -1,0 +1,13 @@
+{
+    "sqltools.connections": [
+        {
+            "database": "${workspaceFolder}/data.db",
+            "dialect": "SQLite",
+            "isActive": false,
+            "isConnected": false,
+            "name": "SARS-CoV-2 DB"
+        }
+    ],
+    "sqltools.useNodeRuntime": true,
+    "python.pythonPath": "/home/quinn/.local/share/virtualenvs/Novel-coronavirus-5bWDwZRt/bin/python"
+}

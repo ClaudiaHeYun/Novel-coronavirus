@@ -16,7 +16,6 @@ import pprint
 DATA = "../data"
 
 def pressure_as_cases_per_pop_times_traffic_volume(*args):
-	# TODO: Normalize this data!
 	cases, pop, traffic = args
 	return (cases / pop) * traffic
 
@@ -24,6 +23,7 @@ def pressure_as_cases_per_pop_times_traffic_volume(*args):
 def calc_viral_pressure(*args):
 	"""A flexible function for calculating the viral pressure on a given country"""
 	return pressure_as_cases_per_pop_times_traffic_volume(*args)
+
 
 def parse_row(row):
 	"""Parses a row of connectedness data into python data types"""
@@ -33,9 +33,10 @@ def parse_row(row):
 	new_row = [row[0], int(row[1]), row[2], int(row[3]), int(row[4]), row[5]]
 	return new_row
 
+
 def get_connectedness_data(db_location):
 	"""
-	Pulls connectedness data from the database then calculates the viral pressure on each node
+	Pulls connectedness data from the database
 	"""
 	conn = sqlite3.connect(db_location)
 	c = conn.cursor()
@@ -95,6 +96,14 @@ def get_connectedness_data(db_location):
 		date :: String, # Date of case data
 	]
 	"""
+	return connectedness_data
+
+
+def get_viral_pressure_data(conn_data):
+	"""
+	Meant to be chained together with get_connectedness_data. Takes the connectedness data and
+	produces a time series of cases of over time matched with flight route data
+	"""
 	countries_query = "select country from cases"
 	countries = [row[0] for row in c.execute(countries_query)]
 	conn.close()
@@ -109,8 +118,7 @@ def get_connectedness_data(db_location):
 			# accumulate viral pressure here
 			data[date][country] =  0
 	
-	# Populate data
-	# collect all data points from connectedness data
+	# Populate accumulator by collecting all data points from connectedness data
 	for row in connectedness_data:
 		hub_country, passengers, spoke_country, spoke_pop, spoke_confirmed_cases, cur_date = row
 		acc_viral_pressure = data[cur_date][hub_country]
@@ -120,8 +128,9 @@ def get_connectedness_data(db_location):
 
 	return data
 
+
 def flatten_data(data):
-	"""Flatten x into an array of tuples"""
+	"""Flatten viral pressure data into an array of tuples"""
 	conn = sqlite3.connect("../data.db")
 	c = conn.cursor()
 	countries_query = "select country from cases group by country;"
@@ -166,6 +175,8 @@ def get_case_data(db_location):
 
 
 def process_y(case_data):
+	"""Calculate days to first infection"""
+	# TODO: Change this to not go negative
 	# there's definitely a better way to do this
 	y = []
 	"""
@@ -240,14 +251,9 @@ def process_y(case_data):
 # 			days.append(row[1])
 # 	return len(days), days
 
-# Goal data spec for running regressions
-# X_all = [Country :: String, Date :: Date, Viral pressure :: Float]
-# Y_all = [Country :: String, Date :: Date, Days to infection :: Integer]
-# Train test split on countries X_i
-
-def aggregated_analysis(file_path):
-	X = flatten_data(get_connectedness_data(file_path))
-	y = process_y(get_case_data(file_path))
+def overall_viral_pressure_analysis(file_path, y):
+	"""Run a regression over all countries over the whole timeline on viral pressure"""
+	X = flatten_data(get_viral_pressure_data(get_connectedness_data(file_path)))
 
 	x_sorted = sorted(X, key=lambda x: x[1] + x[0])
 	y_sorted = sorted(y, key=lambda x: x[1] + x[0])	
@@ -282,7 +288,8 @@ def aggregated_analysis(file_path):
 	print(results.summary())
 
 def daily_analysis(file_path):
-	X = get_connectedness_data(file_path)
+	"""Run a day-by-day analysis of the performance of the viral pressure metric"""
+	X = get_viral_pressure_data(get_connectedness_data(file_path))
 	y = process_y(get_case_data(file_path))
 
 	for (country, date, val) in y:
@@ -321,10 +328,11 @@ def daily_analysis(file_path):
 	plt.clf()
 
 
-# NOTE: Everything below here is just copy-pasted from multiple-regression.py
 def train_test_split(x, y, test_pct):
 	"""input:
-	x: list of x values, y: list of independent values, test_pct: percentage of the data that is testing data=0.2.
+	x: list of x values,
+	y: list of independent values, 
+	test_pct: percentage of the data that is testing data=0.2.
 
 	output: x_train, x_test, y_train, y_test lists
 	"""
@@ -342,31 +350,64 @@ def train_test_split(x, y, test_pct):
 	return (x_train, x_test, y_train, y_test)
 
 
-# Things to finish up today/tomorrow:
-# TODO: train test split I guess?
-
-# Things we could do after this deliverable?
-# TODO: split by days, run a regression for each I guess?
 # TODO: different viral pressure metrics
 	# 1. Try not weighting by population
 	# 2. Try different ways of measuring days to infection (once infected, just n?)
 # TODO: try running with only the nonzero x values
 
+# TODO: Fill in these stencils
+def get_routes(database_path):
+	"""Fetch route data from database"""
+	pass
+
+
+def get_populations(database_path):
+	"""Fetch population data from database"""
+	pass
+
+
+def get_population_density(database_path):
+	"""Fetch population density from the database"""
+	pass
+
+
+def overall_single_regressions(x_variables, y):
+	"""Run a run a reggression over the whole timeline for each variable"""
+	pass
+
+
+def overall_multiregression(x_variables, y):
+	"""Run a multigression over the whole timline with all provided variables"""
+	pass
+
+
 if __name__ == "__main__":
 	pp = pprint.PrettyPrinter()
 	p = 0.2
-	data_file = "../data.db"
+	db_path = "../data.db"
 
-	daily_analysis(data_file)	
-	# aggregated_analysis(data_file)
+	routes = get_routes(db_path)
+	populations = get_populations(db_path)
+	population_density = get_population_density(db_path)
 
-	# Prints out a report containing
-	# R-squared, test MSE & train MSE
-	# print(f"R2: {results.rsquared}")
-	# training_mse = eval_measures.mse(y_train, results.predict(x_train))
-	# print(f"Training MSE: {training_mse}")
-	# x_test = sm.add_constant(x_test)
-	# predicted_y_test = results.predict(x_test)
-	# testing_mse = eval_measures.mse(y_test, predicted_y_test)
-	# print(f"Testing MSE: {testing_mse}")
-	# exit(0)
+	y = process_y(get_case_data(file_path))
+
+	all_x_vars = [inbound_flights, routes, population, population_density]
+
+	# TODO: Minimize redundant queries
+	
+	# Run overall regressions on each individual variable
+	# TODO: Write single_regressions
+	overall_single_regressions(all_x_vars, y)
+
+	# Run a multi-regression on all variables
+	# TODO: Write overall_multiregression
+	overall_multiregression(all_x_vars, y)
+
+	# Run an overall regression on viral pressure
+	overall_viral_pressure_analysis(db_path, y)
+
+	# Run a day-by-day analsysis on viral pressure
+	daily_analysis(db_path)
+
+	exit(0)

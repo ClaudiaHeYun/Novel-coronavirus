@@ -19,7 +19,7 @@ from (
 			select airports.country
 			from airports
 			join (select country from cases) as case_country
-			on case_country.country = airports.country
+			on case_country.country = airports.coutnry
 			where airports.iata = arrival_code
 		) as arrival_country
 	from (
