@@ -100,11 +100,13 @@ def get_connectedness_data(db_location):
 	return connectedness_data
 
 
-def get_viral_pressure_data(conn_data):
+def get_viral_pressure_data(connectedness_data, db_location):
 	"""
 	Meant to be chained together with get_connectedness_data. Takes the connectedness data and
 	produces a time series of cases of over time matched with flight route data
 	"""
+	conn = sqlite3.connect(db_location)
+	c = conn.cursor()
 	countries_query = "select country from cases"
 	countries = [row[0] for row in c.execute(countries_query)]
 	conn.close()
@@ -254,7 +256,7 @@ def process_y(case_data):
 
 def overall_viral_pressure_analysis(file_path, y):
 	"""Run a regression over all countries over the whole timeline on viral pressure"""
-	X = flatten_data(get_viral_pressure_data(get_connectedness_data(file_path)))
+	X = flatten_data(get_viral_pressure_data(get_connectedness_data(file_path), file_path))
 
 	x_sorted = sorted(X, key=lambda x: x[1] + x[0])
 	y_sorted = sorted(y, key=lambda x: x[1] + x[0])	
@@ -284,13 +286,15 @@ def overall_viral_pressure_analysis(file_path, y):
 	# print(type(x_train), type(x_test), type(y_train))
 
 	# Use StatsModels to create the Linear Model and Output R-squared
-	model = sm.OLS(x_sorted_pressure, y_sorted_days)
+	model = sm.OLS(y_sorted_days, x_sorted_pressure)
 	results = model.fit()
-	print(results.summary())
+	with open(f"results/overall-viral-pressure-result-summary.txt", "w+") as rs:
+		rs.write(results.summary().as_text())
+	# print(results.summary())
 
 def daily_analysis(file_path):
 	"""Run a day-by-day analysis of the performance of the viral pressure metric"""
-	X = get_viral_pressure_data(get_connectedness_data(file_path))
+	X = get_viral_pressure_data(get_connectedness_data(file_path), file_path)
 	y = process_y(get_case_data(file_path))
 
 	for (country, date, val) in y:
@@ -300,7 +304,7 @@ def daily_analysis(file_path):
 	for (date, data) in X.items():
 		# _, data = daily_data
 		[x_pressure, y_days] = zip(*data.values())
-		model = sm.OLS(x_pressure, y_days)
+		model = sm.OLS(y_days, x_pressure)
 		results = model.fit()
 		training_mse = eval_measures.mse(y_days, results.predict(y_days))
 		daily_results[date] = (training_mse, results.rsquared)
@@ -402,10 +406,12 @@ def overall_single_regressions(x_variables, y):
 		plt.clf()
 
 		# Use StatsModels to create the Linear Model and Output R-squared
-		model = sm.OLS(x_variables[column], y)
+		model = sm.OLS(y, x_variables[column])
 		results = model.fit()
 		print(f"{column} regression summary:")
-		print(results.summary(), "\n\n")
+		with open(f"results/single-regressions/{column}-result-summary.txt", "w+") as rs:
+			rs.write(results.summary().as_text())
+		# print(results.summary(), "\n\n")
 	return
 
 
@@ -415,10 +421,14 @@ def overall_multiregression(x_variables, y):
 	x and y should be Pandas dataframes.
 	"""
 	# Use StatsModels to create the Linear Model and Output R-squared
-	model = sm.OLS(x_variables, y)
+	x_variables = sm.add_constant(x_variables)
+	model = sm.OLS(y, x_variables)
 	results = model.fit()
 	print(f"Multiregression summary:")
-	print(results.summary())
+	with open(f"results/multiregression-result-summary.txt", "w+") as rs:
+		rs.write(results.summary().as_text())
+	# print(results.summary())
+	return
 
 
 if __name__ == "__main__":
@@ -453,25 +463,24 @@ if __name__ == "__main__":
 	# TODO: Here, again, we've got trouble with aligning countries
 	# For now, restricting y and x to their intersection is a start
 	days_to_first_infection = [row for row in days_to_first_infection if row[0] in pop_countries]
-	print(len(days_to_first_infection))
 	# Exclude the country column
 	subset_population_data = [row[1:] for row in population_data if row[0] in [d[0] for d in days_to_first_infection]]
-	print(len(subset_population_data))
 
 	# Put data into a dataframe
 	columns = ["population", "density"]
 	x_df = pd.DataFrame(subset_population_data, columns=columns)
+	only_days = [row[2] for row in days_to_first_infection]
 
 	# Run overall regressions on each individual variable
 	# TODO: Write single_regressions
-	overall_single_regressions(x_df, [row[2] for row in days_to_first_infection])
+	overall_single_regressions(x_df, only_days)
 
 	# # Run a multi-regression on all variables
 	# # TODO: Write overall_multiregression
-	# overall_multiregression(all_x_vars, y)
+	overall_multiregression(x_df, only_days)
 
 	# # Run an overall regression on viral pressure
-	# overall_viral_pressure_analysis(db_path, y)
+	overall_viral_pressure_analysis(db_path, y)
 
 	# # Run a day-by-day analsysis on viral pressure
 	# daily_analysis(db_path)
