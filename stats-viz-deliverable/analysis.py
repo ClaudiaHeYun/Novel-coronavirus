@@ -13,6 +13,7 @@ import statsmodels.formula.api as smf
 from datetime import date
 import pprint
 
+
 DATA = "../data"
 
 def pressure_as_cases_per_pop_times_traffic_volume(*args):
@@ -357,28 +358,67 @@ def train_test_split(x, y, test_pct):
 
 # TODO: Fill in these stencils
 def get_routes(database_path):
-	"""Fetch route data from database"""
-	pass
+	"""
+	Takes a path to the database and produces a list of countries and the number
+	of incoming flight routes
+	"""
+	route_query = """
+	select
+		a2.country as arrival_country,
+		count()
+	from routes
+	inner join airports as a1
+	on departure_code = a1.iata
+	inner join airports as a2
+	on arrival_code = a2.iata
+	group by a2.country
+	"""
+	with sqlite3.connect(database_path) as conn:
+		return [row for row in conn.cursor().execute(route_query)]
 
 
-def get_populations(database_path):
-	"""Fetch population data from database"""
-	pass
-
-
-def get_population_density(database_path):
-	"""Fetch population density from the database"""
-	pass
+def get_population_data(database_path):
+	"""Takes a path and produces a list of countries and their populations"""
+	population_query = """select name, population, density from countries"""
+	with sqlite3.connect(database_path) as conn:
+		return [row for row in conn.cursor().execute(population_query)]
 
 
 def overall_single_regressions(x_variables, y):
-	"""Run a run a reggression over the whole timeline for each variable"""
-	pass
+	"""
+	Run a regression over the whole timeline for each variable.
+	x and y should be Pandas dataframes.
+	"""
+	for column in x_variables.columns:
+		plt.scatter(x_variables[column], y)
+		plt.ylabel("Days to infection")
+		plt.xlabel(column)
+		plt.savefig(f"results/single-regressions/{column}-scatter.png")
+		plt.clf()
+
+		plt.hist(x_variables[column])
+		plt.ylabel(column)
+		plt.savefig(f"results/single-regressions/{column}-histogram.png")
+		plt.clf()
+
+		# Use StatsModels to create the Linear Model and Output R-squared
+		model = sm.OLS(x_variables[column], y)
+		results = model.fit()
+		print(f"{column} regression summary:")
+		print(results.summary(), "\n\n")
+	return
 
 
 def overall_multiregression(x_variables, y):
-	"""Run a multigression over the whole timline with all provided variables"""
-	pass
+	"""
+	Run a multigression over the whole timeline with all provided variables.
+	x and y should be Pandas dataframes.
+	"""
+	# Use StatsModels to create the Linear Model and Output R-squared
+	model = sm.OLS(x_variables, y)
+	results = model.fit()
+	print(f"Multiregression summary:")
+	print(results.summary())
 
 
 if __name__ == "__main__":
@@ -387,27 +427,53 @@ if __name__ == "__main__":
 	db_path = "../data.db"
 
 	routes = get_routes(db_path)
-	populations = get_populations(db_path)
-	population_density = get_population_density(db_path)
+	route_countries = set([route[0] for route in routes])
+	population_data = get_population_data(db_path)
+	pop_countries = set([r[0] for r in population_data])
 
-	y = process_y(get_case_data(file_path))
-
-	all_x_vars = [inbound_flights, routes, population, population_density]
-
-	# TODO: Minimize redundant queries
+	# TODO: There are problems with which countries do or don't in different
+	# tables. See the below print statements. Clean up countries that have different
+	# spellings and decide what to do with countries that don't have data.
+	# print("Num countries in routes table:", len(routes))
+	# print("Num countries in countries table:", len(population_data))
+	# print("Symmetric difference (in either but no both):")
+	# pp.pprint(route_countries ^ pop_countries)
+	# print("In population but not routes:")
+	# pp.pprint(pop_countries - route_countries)
+	# print("In routes but not populations:")
+	# pp.pprint(route_countries - pop_countries)
 	
+	# TODO: Would like to turn it all into a single df but can't
+	# do this until routes and population line up
+	# x_df["routes"] = routes
+
+	y = process_y(get_case_data(db_path))
+	# Restrict y to days from days zero
+	days_to_first_infection = [row for row in y if row[1] == "1/22/20"]
+	# TODO: Here, again, we've got trouble with aligning countries
+	# For now, restricting y and x to their intersection is a start
+	days_to_first_infection = [row for row in days_to_first_infection if row[0] in pop_countries]
+	print(len(days_to_first_infection))
+	# Exclude the country column
+	subset_population_data = [row[1:] for row in population_data if row[0] in [d[0] for d in days_to_first_infection]]
+	print(len(subset_population_data))
+
+	# Put data into a dataframe
+	columns = ["population", "density"]
+	x_df = pd.DataFrame(subset_population_data, columns=columns)
+
 	# Run overall regressions on each individual variable
 	# TODO: Write single_regressions
-	overall_single_regressions(all_x_vars, y)
+	overall_single_regressions(x_df, [row[2] for row in days_to_first_infection])
 
-	# Run a multi-regression on all variables
-	# TODO: Write overall_multiregression
-	overall_multiregression(all_x_vars, y)
+	# # Run a multi-regression on all variables
+	# # TODO: Write overall_multiregression
+	# overall_multiregression(all_x_vars, y)
 
-	# Run an overall regression on viral pressure
-	overall_viral_pressure_analysis(db_path, y)
+	# # Run an overall regression on viral pressure
+	# overall_viral_pressure_analysis(db_path, y)
 
-	# Run a day-by-day analsysis on viral pressure
-	daily_analysis(db_path)
+	# # Run a day-by-day analsysis on viral pressure
+	# daily_analysis(db_path)
 
 	exit(0)
