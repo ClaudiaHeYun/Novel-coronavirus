@@ -408,7 +408,7 @@ def overall_single_regressions(x_variables, y):
 		# Use StatsModels to create the Linear Model and Output R-squared
 		model = sm.OLS(y, x_variables[column])
 		results = model.fit()
-		print(f"{column} regression summary:")
+		# print(f"{column} regression summary:")
 		with open(f"results/single-regressions/{column}-result-summary.txt", "w+") as rs:
 			rs.write(results.summary().as_text())
 		# print(results.summary(), "\n\n")
@@ -424,7 +424,7 @@ def overall_multiregression(x_variables, y):
 	x_variables = sm.add_constant(x_variables)
 	model = sm.OLS(y, x_variables)
 	results = model.fit()
-	print(f"Multiregression summary:")
+	# print(f"Multiregression summary:")
 	with open(f"results/multiregression-result-summary.txt", "w+") as rs:
 		rs.write(results.summary().as_text())
 	# print(results.summary())
