@@ -162,13 +162,10 @@ labels = cases_json["labels"]
 for country, daily_totals in cases_json["countries"].values():
     dates = labels[1]   
     for date, daily_total in zip(dates, daily_totals):
-        date = date.split("/")
-        month = "0" + date[0]
-        if (len(date[1]) > 1):
-            day = date[1]
-        else:
-            day = "0" + date[1]
-        year = "2020"
+        month, day, year = date.split("/")
+        month = "0" + month if len(month) == 1 else month
+        day = "0" + day if len(day) == 1 else day
+        year = "20" + year
         date = "-".join([year, month, day])
         c.execute("INSERT INTO cases (date, country, confirmed) VALUES (?, ?, ?)", (
             date,
