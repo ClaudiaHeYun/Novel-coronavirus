@@ -477,7 +477,7 @@ def overall_multiregression(x_train, x_test, y_train, y_test):
 if __name__ == "__main__":
 	pp = pprint.PrettyPrinter()
 	p = 0.2
-	db_path = "data.db"
+	db_path = "../data.db"
 
 	routes = get_routes(db_path)
 	route_countries = set([route[0] for route in routes])
