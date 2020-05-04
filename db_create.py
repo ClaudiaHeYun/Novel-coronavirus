@@ -28,7 +28,7 @@ china_reader = csv.DictReader(china_csv)
 case_reports_file = open(f"{DATA_PATH}/virus/case_series.json")
 cases_json = json.load(case_reports_file)
 
-airports_csv = open(f"{DATA_PATH}/flights/airports.csv")
+airports_csv = open(f"{DATA_PATH}/flights/airports.csv", encoding = "UTF-8")
 airports_reader = csv.DictReader(airports_csv)
 
 routes_csv = open(f"{DATA_PATH}/flights/routes.csv")
