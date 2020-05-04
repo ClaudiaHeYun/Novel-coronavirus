@@ -408,6 +408,7 @@ def get_routes(database_path):
 	on departure_code = a1.iata
 	inner join airports as a2
 	on arrival_code = a2.iata
+	where a1.country != a2.country
 	group by a2.country
 	"""
 	with sqlite3.connect(database_path) as conn:
@@ -530,18 +531,18 @@ if __name__ == "__main__":
 
 
 
-	# # Run overall regressions on each individual variable
-	# # TODO: Write single_regressions
+	# Run overall regressions on each individual variable
+	# TODO: Write single_regressions
 	overall_single_regressions(x_train, x_test, y_train, y_test)
 
-	# # # Run a multi-regression on all variables
-	# # # TODO: Write overall_multiregression
+	# Run a multi-regression on all variables
+	# TODO: Write overall_multiregression
 	overall_multiregression(x_train, x_test, y_train, y_test)
 
-	# # # Run an overall regression on viral pressure
+	# Run an overall regression on viral pressure
 	overall_viral_pressure_analysis(db_path, y)
 
-	# # Run a day-by-day analsysis on viral pressure
+	# Run a day-by-day analsysis on viral pressure
 	# daily_analysis(db_path)
 
 
