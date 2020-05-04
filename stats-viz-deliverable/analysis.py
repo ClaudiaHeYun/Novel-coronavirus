@@ -177,6 +177,22 @@ def get_case_data(db_location):
 	return case_data
 
 
+def get_dates(db_location):
+	"""
+	Pulls data from the database
+	"""
+	conn = sqlite3.connect(db_location)
+	c = conn.cursor()
+	date_query = """
+	select date
+	from cases
+	group by date
+	order by date;
+	"""
+	dates = [row[0] for row in c.execute(date_query)]
+	return dates
+
+
 def process_y(case_data):
 	"""Calculate days to first infection"""
 	# TODO: Change this to not go negative
@@ -214,6 +230,23 @@ def process_y(case_data):
 			days += 1
 		i -= 1
 	return y
+
+def add_previous_cases(X, case_data):
+	# ordered_dates = get_dates("data.db")
+	# print(ordered_dates)
+	index = 1
+	curr_country = X[0][0]
+	while index < len(X):
+		record = list(X[index])
+		if (curr_country == X[index][0]):
+			record.append(case_data[index-1][2])
+			X[index] = record
+			index += 1
+		else:
+			curr_country = X[index][0]
+			X[index] = record
+			index += 1
+	return X
 
 # def add_missing(countries, x_sorted, y, default):
 
@@ -388,60 +421,70 @@ def get_population_data(database_path):
 		return [row for row in conn.cursor().execute(population_query)]
 
 
-def overall_single_regressions(x_variables, y):
+def overall_single_regressions(x_train, x_test, y_train, y_test):
 	"""
 	Run a regression over the whole timeline for each variable.
 	x and y should be Pandas dataframes.
 	"""
-	for column in x_variables.columns:
-		plt.scatter(x_variables[column], y)
+	for column in x_train.columns:
+		plt.scatter(x_train[column], y_train)
 		plt.ylabel("Days to infection")
 		plt.xlabel(column)
 		plt.savefig(f"results/single-regressions/{column}-scatter.png")
 		plt.clf()
 
-		plt.hist(x_variables[column])
+		plt.hist(x_train[column])
 		plt.ylabel(column)
 		plt.savefig(f"results/single-regressions/{column}-histogram.png")
 		plt.clf()
 
 		# Use StatsModels to create the Linear Model and Output R-squared
-		model = sm.OLS(y, x_variables[column])
+		model = sm.OLS(y_train, x_train[column])
 		results = model.fit()
 		# print(f"{column} regression summary:")
 		with open(f"results/single-regressions/{column}-result-summary.txt", "w+") as rs:
 			rs.write(results.summary().as_text())
+			training_mse = eval_measures.mse(y_train, results.predict(x_train[column]))
+			testing_mse = eval_measures.mse(y_test, results.predict(x_test[column]))
+			rs.write("\n training MSE: " + str(training_mse))
+			rs.write("\n testing MSE: " + str(testing_mse))
 		# print(results.summary(), "\n\n")
 	return
 
 
-def overall_multiregression(x_variables, y):
+def overall_multiregression(x_train, x_test, y_train, y_test):
 	"""
 	Run a multigression over the whole timeline with all provided variables.
 	x and y should be Pandas dataframes.
 	"""
 	# Use StatsModels to create the Linear Model and Output R-squared
-	x_variables = sm.add_constant(x_variables)
-	model = sm.OLS(y, x_variables)
+	x_train = sm.add_constant(x_train)
+	x_test = sm.add_constant(x_test)
+	model = sm.OLS(y_train, x_train)
 	results = model.fit()
 	# print(f"Multiregression summary:")
 	with open(f"results/multiregression-result-summary.txt", "w+") as rs:
 		rs.write(results.summary().as_text())
+		training_mse = eval_measures.mse(y_train, results.predict(x_train))
+		testing_mse = eval_measures.mse(y_test, results.predict(x_test))
+		rs.write("\n training MSE: " + str(training_mse))
+		rs.write("\n testing MSE: " + str(testing_mse))
 	# print(results.summary())
 	return
+
 
 
 if __name__ == "__main__":
 	pp = pprint.PrettyPrinter()
 	p = 0.2
-	db_path = "../data.db"
+	db_path = "data.db"
 
 	routes = get_routes(db_path)
 	route_countries = set([route[0] for route in routes])
 	population_data = get_population_data(db_path)
 	pop_countries = set([r[0] for r in population_data])
 
-	# TODO: There are problems with which countries do or don't appear in different
+	# TODO: There are problems with which countries do or don't in different
 	# tables. See the below print statements. Clean up countries that have different
 	# spellings and decide what to do with countries that don't have data.
 	# print("Num countries in routes table:", len(routes))
@@ -457,32 +500,53 @@ if __name__ == "__main__":
 	# do this until routes and population line up
 	# x_df["routes"] = routes
 
+
+	## analysis: days until first infection, predicted by population and density
+
 	y = process_y(get_case_data(db_path))
 	# Restrict y to days from days zero
-	days_to_first_infection = [row for row in y if row[1] == "1/22/20"]
+	days_to_first_infection = [row for row in y if row[1] == "2020-01-22"]
 	# TODO: Here, again, we've got trouble with aligning countries
 	# For now, restricting y and x to their intersection is a start
 	days_to_first_infection = [row for row in days_to_first_infection if row[0] in pop_countries]
+
+	## sort, for pairing x and y (not sure 100% if this is necessary?)
+	# days_to_first_infection.sort(lambda x: x[0])
+	# population_data.sort(lambda x: x[0])
+
 	# Exclude the country column
 	subset_population_data = [row[1:] for row in population_data if row[0] in [d[0] for d in days_to_first_infection]]
 
-	# Put data into a dataframe
-	columns = ["population", "density"]
-	x_df = pd.DataFrame(subset_population_data, columns=columns)
+	# clear out country and date values	
 	only_days = [row[2] for row in days_to_first_infection]
 
-	# Run overall regressions on each individual variable
-	# TODO: Write single_regressions
-	overall_single_regressions(x_df, only_days)
+	# Use train test split to split data into x_train, x_test, y_train, y_test #
+	(x_train, x_test, y_train, y_test) = train_test_split(subset_population_data, only_days, p)
 
-	# # Run a multi-regression on all variables
-	# # TODO: Write overall_multiregression
-	overall_multiregression(x_df, only_days)
+	# # Put data into a dataframe
+	columns = ["population", "density"]
+	x_test = pd.DataFrame(x_test, columns=columns)
+	x_train = pd.DataFrame(x_train, columns=columns)
 
-	# # Run an overall regression on viral pressure
+
+
+	# # Run overall regressions on each individual variable
+	# # TODO: Write single_regressions
+	overall_single_regressions(x_train, x_test, y_train, y_test)
+
+	# # # Run a multi-regression on all variables
+	# # # TODO: Write overall_multiregression
+	overall_multiregression(x_train, x_test, y_train, y_test)
+
+	# # # Run an overall regression on viral pressure
 	overall_viral_pressure_analysis(db_path, y)
 
 	# # Run a day-by-day analsysis on viral pressure
-	# daily_analysis(db_path)
+	daily_analysis(db_path)
+
+
+	## Analysis: Number of cases by day&country, according to past
+
+
 
 	exit(0)
