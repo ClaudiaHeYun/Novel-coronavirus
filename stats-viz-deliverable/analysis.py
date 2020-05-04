@@ -441,7 +441,7 @@ if __name__ == "__main__":
 	population_data = get_population_data(db_path)
 	pop_countries = set([r[0] for r in population_data])
 
-	# TODO: There are problems with which countries do or don't in different
+	# TODO: There are problems with which countries do or don't appear in different
 	# tables. See the below print statements. Clean up countries that have different
 	# spellings and decide what to do with countries that don't have data.
 	# print("Num countries in routes table:", len(routes))
