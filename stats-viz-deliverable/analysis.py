@@ -345,7 +345,7 @@ def daily_analysis(file_path):
 	[mse, rsquared] = zip(*daily_results.values())
 
 	# dates = daily_results.keys()
-	dates = [pd.to_datetime(d) for d in daily_results.keys()]
+	dates = [pd.to_datetime(d, format="%Y-%m-%d") for d in daily_results.keys()]
 
 	ax = plt.gca()
 	ax.xaxis.set_major_formatter(mdates.DateFormatter("%m-%d"))
@@ -542,7 +542,7 @@ if __name__ == "__main__":
 	overall_viral_pressure_analysis(db_path, y)
 
 	# # Run a day-by-day analsysis on viral pressure
-	daily_analysis(db_path)
+	# daily_analysis(db_path)
 
 
 	## Analysis: Number of cases by day&country, according to past

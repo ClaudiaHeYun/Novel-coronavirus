@@ -30,7 +30,15 @@ if __name__ == "__main__":
 	reader = csv.reader(f)
 	# NOTE: The header row will be useful when running time series
 	labels = next(reader) # skip header line
-	labels = ["Country", labels[4:]]
+	dates = []
+	for date in labels[4:]:
+		month, day, year = date.split("/")
+		month = "0" + month if len(month) == 1 else month
+		day = "0" + day if len(day) == 1 else day
+		year = "20" + year
+		date = "-".join([year, month, day])
+		dates += [date]
+	labels = ["Country", dates]
 	output = { "labels": labels }
 	for row in reader:
 		cur_row = parse_row(row)
