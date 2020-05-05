@@ -5,6 +5,7 @@ verify_ssl = true
 
 [dev-packages]
 pylint = "*"
+rope = "*"
 
 [packages]
 numpy = "*"
@@ -13,6 +14,7 @@ statsmodels = "*"
 requests = "*"
 matplotlib = "*"
 plotly = "*"
+sklearn = "*"
 
 [requires]
 python_version = "3.8"

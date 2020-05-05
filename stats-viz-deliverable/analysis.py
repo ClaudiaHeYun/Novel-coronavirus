@@ -12,6 +12,7 @@ from statsmodels.tools import eval_measures
 import statsmodels.formula.api as smf
 from datetime import date
 import pprint
+from sklearn.model_selection import train_test_split
 
 
 DATA = "../data"
@@ -366,38 +367,11 @@ def daily_analysis(file_path):
 	plt.clf()
 
 
-def train_test_split(x, y, test_pct):
-	"""input:
-	x: list of x values,
-	y: list of independent values, 
-	test_pct: percentage of the data that is testing data=0.2.
-
-	output: x_train, x_test, y_train, y_test lists
-	"""
-	
-	#TODO: Split the features X and the labels y into x_train, x_test and y_train, y_test as specified by test_pct. 
-	#You can re-use code from part I.
-	# Turn this into a numpy
-	test_size = round(len(x) * test_pct)
-	test_indices = random.sample(range(len(x)), test_size)
-	train_indices = list(set(range(len(x))).difference(set(test_indices)))
-	x_test = np.array([x[i] for i in test_indices])
-	x_train = np.array([x[i] for i in train_indices])
-	y_test = np.array([y[i] for i in test_indices])
-	y_train = np.array([y[i] for i in train_indices])
-	return (x_train, x_test, y_train, y_test)
-
-
-# TODO: different viral pressure metrics
-	# 1. Try not weighting by population
-	# 2. Try different ways of measuring days to infection (once infected, just n?)
-# TODO: try running with only the nonzero x values
-
 # TODO: Fill in these stencils
 def get_routes(database_path):
 	"""
 	Takes a path to the database and produces a list of countries and the number
-	of incoming flight routes
+	of incoming international flight routes
 	"""
 	route_query = """
 	select
@@ -428,7 +402,8 @@ def overall_single_regressions(x_train, x_test, y_train, y_test):
 	x and y should be Pandas dataframes.
 	"""
 	for column in x_train.columns:
-		plt.scatter(x_train[column], y_train)
+		x = x_train[column]
+		plt.scatter(x, y_train)
 		plt.ylabel("Days to infection")
 		plt.xlabel(column)
 		plt.savefig(f"results/single-regressions/{column}-scatter.png")
@@ -508,15 +483,18 @@ def create_population_and_routes_dataframe(routes, route_countries, population_d
 
 if __name__ == "__main__":
 	pp = pprint.PrettyPrinter()
-	p = 0.2
 	db_path = "../data.db"
 
+	# Get routes and a set of all countries in route data
+	# Intersecting all these sets will allow us to cull rows from our data before
+	# running our multiregression
 	routes = get_routes(db_path)
 	route_countries = set([route[0] for route in routes])
+
 	population_data = get_population_data(db_path)
 	pop_countries = set([r[0] for r in population_data])
 
-	# TODO: There are problems with which countries do or don't in different
+	# TODO: There are problems with which countries do or don't appear in different
 	# tables. See the below print statements. Clean up countries that have different
 	# spellings and decide what to do with countries that don't have data.
 	# print("Num countries in routes table:", len(routes))
@@ -527,58 +505,60 @@ if __name__ == "__main__":
 	# pp.pprint(pop_countries - route_countries)
 	# print("In routes but not populations:")
 	# pp.pprint(route_countries - pop_countries)
-	
-	# TODO: Would like to turn it all into a single df but can't
-	# do this until routes and population line up
-	# x_df["routes"] = routes
 
-
-	## analysis: days until first infection, predicted by population and density
-
-	y = process_y(get_case_data(db_path))
+	# Y is a time series for all countries for all days
+	y_time_series = process_y(get_case_data(db_path))
 	# Restrict y to days from days zero
-	days_to_first_infection = [row for row in y if row[1] == "2020-01-22"]
-	# TODO: Here, again, we've got trouble with aligning countries
-	# For now, restricting y and x to their intersection is a start
-	days_to_first_infection = [row for row in days_to_first_infection if row[0] in pop_countries]
+	# TODO: Here, again, we've got trouble with aligning countries unless we do better clean when making db
+	days_to_first_infection = [row for row in y_time_series if row[1] == "2020-01-22"]
+	# A set of countries for which we have case data
+	case_countries = set([row[0] for row in days_to_first_infection])
 
-	## sort, for pairing x and y (not sure 100% if this is necessary?)
-	# days_to_first_infection.sort(lambda x: x[0])
-	# population_data.sort(lambda x: x[0])
+	# Take the intersection of the countries present in all countries
+	# then only include these countries in the multi-regression
+	# 169 countries make it into this intersections, which should be enough
+	intersect_countries_of_all_vars = route_countries & pop_countries & case_countries
 
-	# Exclude the country column
-	subset_population_data = [row[1:] for row in population_data if row[0] in [d[0] for d in days_to_first_infection]]
+	# Restrict y to only rows where the country appears in the intersection
+	days_to_first_infection = [row[2] for row in days_to_first_infection if row[0] in intersect_countries_of_all_vars]
 
-	# clear out country and date values	
-	only_days = [row[2] for row in days_to_first_infection]
+	# # Sanity check alignment of rows. Uncomment and run when making changes.
+	# check_pop_data = [row for row in population_data if row[0] in intersect_countries_of_all_vars]
+	# check_route_data = [row for row in routes if row[0] in intersect_countries_of_all_vars]
+	# # Checks that all rows line up
+	# print("Do all rows line up?", all([prow[0] == rrow[0] and prow[0] == drow[0] for prow, rrow, drow in zip(check_pop_data, check_route_data, days_to_first_infection)]))
 
-	# Use train test split to split data into x_train, x_test, y_train, y_test #
-	(x_train, x_test, y_train, y_test) = train_test_split(subset_population_data, only_days, p)
+	# # Exclude the country column and take only data that has a country that's in the intersection of all variables
+	# Reminder that population data has both population and density in it
+	subset_population_data = [row[1:] for row in population_data if row[0] in intersect_countries_of_all_vars]
+	# Split up population data
+	pop_data = [row[0] for row in subset_population_data]
+	density_data = [row[1] for row in subset_population_data]
+	subset_route_data = [route[1] for route in routes if route[0] in intersect_countries_of_all_vars]
+	# You can add countries to either x or y to make it easy to see which rows correspond to which country if you need
+	countries = [row[0] for row in population_data]
 
-	# # Put data into a dataframe
-	columns = ["population", "density"]
-	x_test = pd.DataFrame(x_test, columns=columns)
-	x_train = pd.DataFrame(x_train, columns=columns)
+	columns = ["population", "density", "routes"]
+	X = pd.DataFrame(zip(pop_data, density_data, subset_route_data), columns=columns)
+	y_columns = ["days_to_first_infection"]
+	y = pd.DataFrame(zip(days_to_first_infection), columns=y_columns)
 
-
+	# Split data into x_train, x_test, y_train, y_test
+	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.2)
 
 	# Run overall regressions on each individual variable
-	# TODO: Write single_regressions
-	overall_single_regressions(x_train, x_test, y_train, y_test)
+	overall_single_regressions(X_train, X_test, y_train, y_test)
 
 	# Run a multi-regression on all variables
-	# TODO: Write overall_multiregression
-	overall_multiregression(x_train, x_test, y_train, y_test)
+	overall_multiregression(X_train, X_test, y_train, y_test)
 
-	# Run an overall regression on viral pressure
-	overall_viral_pressure_analysis(db_path, y)
+	# # Run an overall regression on viral pressure
+	# overall_viral_pressure_analysis(db_path, y_time_series)
 
-	# Run a day-by-day analsysis on viral pressure
+	# # Run a day-by-day analsysis on viral pressure
 	# daily_analysis(db_path)
 
-
-	## Analysis: Number of cases by day&country, according to past
-
-
+	# TODO: Stretch analysis would be countin the number of "hot" routes on a daily basis based
+	# on whether those routes are coming from infected countries
 
 	exit(0)
