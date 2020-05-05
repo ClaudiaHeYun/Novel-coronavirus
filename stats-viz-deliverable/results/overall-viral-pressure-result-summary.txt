@@ -4,7 +4,7 @@ Dep. Variable:                      y   R-squared (uncentered):                 
 Model:                            OLS   Adj. R-squared (uncentered):              0.012
 Method:                 Least Squares   F-statistic:                              237.7
 Date:                Tue, 05 May 2020   Prob (F-statistic):                    2.56e-53
-Time:                        12:02:04   Log-Likelihood:                         -95396.
+Time:                        12:43:09   Log-Likelihood:                         -95396.
 No. Observations:               19074   AIC:                                  1.908e+05
 Df Residuals:                   19073   BIC:                                  1.908e+05
 Df Model:                           1                                                  
