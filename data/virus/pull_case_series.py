@@ -17,6 +17,16 @@ def parse_row(row):
 		country = "United States"
 	if country == "Taiwan*":
 		country = "Taiwan"
+	if country == "Czechia":
+		country = "Czech Republic"
+	if country == "Korea, North":
+		country = "North Korea"
+	if country == "Korea, South":
+		country = "South Korea"
+	if country == "Micronesia, Federated States of":
+		country == "Micronesia"
+	if country == "Bahamas, The":
+		country = "Bahamas"
 	daily_totals = [int(total) for total in daily_totals]
 	return (country, daily_totals)
 

@@ -463,18 +463,6 @@ if __name__ == "__main__":
 	population_data = get_population_data(db_path)
 	pop_countries = set([r[0] for r in population_data])
 
-	# TODO: There are problems with which countries do or don't appear in different
-	# tables. See the below print statements. Clean up countries that have different
-	# spellings and decide what to do with countries that don't have data.
-	# print("Num countries in routes table:", len(routes))
-	# print("Num countries in countries table:", len(population_data))
-	# print("Symmetric difference (in either but no both):")
-	# pp.pprint(route_countries ^ pop_countries)
-	# print("In population but not routes:")
-	# pp.pprint(pop_countries - route_countries)
-	# print("In routes but not populations:")
-	# pp.pprint(route_countries - pop_countries)
-
 	# Y is a time series for all countries for all days
 	y_time_series = process_y(get_case_data(db_path))
 	# Restrict y to days from days zero
@@ -482,6 +470,15 @@ if __name__ == "__main__":
 	days_to_first_infection = [row for row in y_time_series if row[1] == "2020-01-22"]
 	# A set of countries for which we have case data
 	case_countries = set([row[0] for row in days_to_first_infection])
+
+	# # TODO: There are problems with which countries do or don't appear in different
+	# # tables. See the below print statements. Clean up countries that have different
+	# # spellings and decide what to do with countries that don't have data.
+	# print("Num countries in routes table:", len(routes))
+	# print("Num countries in countries table:", len(population_data))
+	# print("Num countries in cases table:", len(case_countries))
+	# print("Symmetric difference (in either but not both):")
+	# pp.pprint((route_countries | pop_countries) ^ case_countries)
 
 	# Take the intersection of the countries present in all countries
 	# then only include these countries in the multi-regression

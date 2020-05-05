@@ -1,0 +1,31 @@
+                               OLS Regression Results                              
+===================================================================================
+Dep. Variable:     days_to_first_infection   R-squared:                       0.380
+Model:                                 OLS   Adj. R-squared:                  0.366
+Method:                      Least Squares   F-statistic:                     27.42
+Date:                     Tue, 05 May 2020   Prob (F-statistic):           6.86e-14
+Time:                             14:59:53   Log-Likelihood:                -577.21
+No. Observations:                      138   AIC:                             1162.
+Df Residuals:                          134   BIC:                             1174.
+Df Model:                                3                                         
+Covariance Type:                 nonrobust                                         
+=============================================================================================
+                                coef    std err          t      P>|t|      [0.025      0.975]
+---------------------------------------------------------------------------------------------
+const                        47.7002      1.731     27.559      0.000      44.277      51.123
+population                -1.569e-08   8.57e-09     -1.830      0.069   -3.26e-08    1.26e-09
+density                      -0.0020      0.005     -0.386      0.700      -0.012       0.008
+number-of-incoming-routes    -0.0268      0.003     -7.944      0.000      -0.034      -0.020
+==============================================================================
+Omnibus:                       10.596   Durbin-Watson:                   2.327
+Prob(Omnibus):                  0.005   Jarque-Bera (JB):               20.258
+Skew:                          -0.275   Prob(JB):                     3.99e-05
+Kurtosis:                       4.795   Cond. No.                     2.21e+08
+==============================================================================
+
+Warnings:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+[2] The condition number is large, 2.21e+08. This might indicate that there are
+strong multicollinearity or other numerical problems.
+ training MSE: 251.4973795619283
+ testing MSE: 219.2731724232707

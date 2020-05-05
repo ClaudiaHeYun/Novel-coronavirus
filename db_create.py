@@ -150,8 +150,21 @@ for row in china_reader:
         row["Population"]))
 
 for row in country_reader:
+    country = row["Country"]
+    if country == "Czechia":
+        country = "Czech Republic"
+    if country == "Korea, North":
+        country = "North Korea"
+    if country == "Korea, South":
+        country = "South Korea"
+    if country == "Micronesia, Federated States of":
+        country = "Micronesia"
+    if country == "Bahamas, The":
+        country = "Bahamas"
+    if country == "Gambia, The":
+        country = "Gambia"
     c.execute("INSERT INTO countries VALUES (?, ?, ?, ?, ?)", (
-        row["Country"], 
+        country, 
         row["Year"], 
         row["Population"], 
         row["Area (sq. km.)"], 
@@ -170,11 +183,14 @@ for country, daily_totals in cases_json["countries"].values():
 for row in airports_reader:
     # NOTE: IATA codes has \N when no code is known. There 1626 such records
     # NOTE: ICAO has one record with a \N
+    country = row["COUNTRY"]
+    if country == "Micronesia, Federated States of":
+        country = "Micronesia"
     c.execute("INSERT INTO airports VALUES (?, ?, ?, ?, ?, ?)", (
         row["AIRPORT_ID"],
         row["NAME"],
         row["CITY"],
-        row["COUNTRY"],
+        country,
         row["IATA"],
         row["ICAO"]))
 

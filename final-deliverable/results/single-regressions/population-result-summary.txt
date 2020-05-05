@@ -1,0 +1,26 @@
+                                   OLS Regression Results                                   
+============================================================================================
+Dep. Variable:     days_to_first_infection   R-squared (uncentered):                   0.017
+Model:                                 OLS   Adj. R-squared (uncentered):              0.010
+Method:                      Least Squares   F-statistic:                              2.427
+Date:                     Tue, 05 May 2020   Prob (F-statistic):                       0.122
+Time:                             14:59:52   Log-Likelihood:                         -721.86
+No. Observations:                      138   AIC:                                      1446.
+Df Residuals:                          137   BIC:                                      1449.
+Df Model:                                1                                                  
+Covariance Type:                 nonrobust                                                  
+==============================================================================
+                 coef    std err          t      P>|t|      [0.025      0.975]
+------------------------------------------------------------------------------
+population  3.445e-08   2.21e-08      1.558      0.122   -9.27e-09    7.82e-08
+==============================================================================
+Omnibus:                       26.910   Durbin-Watson:                   0.543
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):               43.220
+Skew:                          -0.950   Prob(JB):                     4.12e-10
+Kurtosis:                       4.976   Cond. No.                         1.00
+==============================================================================
+
+Warnings:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+ training MSE: 2046.4573804989661
+ testing MSE: 1959.9611809958187

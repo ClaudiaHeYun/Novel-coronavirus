@@ -1,0 +1,26 @@
+                                   OLS Regression Results                                   
+============================================================================================
+Dep. Variable:     days_to_first_infection   R-squared (uncentered):                   0.026
+Model:                                 OLS   Adj. R-squared (uncentered):              0.019
+Method:                      Least Squares   F-statistic:                              3.643
+Date:                     Tue, 05 May 2020   Prob (F-statistic):                      0.0584
+Time:                             14:59:53   Log-Likelihood:                         -721.26
+No. Observations:                      138   AIC:                                      1445.
+Df Residuals:                          137   BIC:                                      1447.
+Df Model:                                1                                                  
+Covariance Type:                 nonrobust                                                  
+=============================================================================================
+                                coef    std err          t      P>|t|      [0.025      0.975]
+---------------------------------------------------------------------------------------------
+number-of-incoming-routes     0.0155      0.008      1.909      0.058      -0.001       0.032
+==============================================================================
+Omnibus:                       20.632   Durbin-Watson:                   0.671
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):               24.854
+Skew:                          -0.934   Prob(JB):                     4.01e-06
+Kurtosis:                       3.913   Cond. No.                         1.00
+==============================================================================
+
+Warnings:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+ training MSE: 2028.7645899030208
+ testing MSE: 1879.931697021089
