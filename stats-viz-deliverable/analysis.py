@@ -420,10 +420,10 @@ def overall_single_regressions(x_train, x_test, y_train, y_test):
 		# print(f"{column} regression summary:")
 		with open(f"results/single-regressions/{column}-result-summary.txt", "w+") as rs:
 			rs.write(results.summary().as_text())
-			training_mse = eval_measures.mse(y_train, results.predict(x_train[column]))
-			testing_mse = eval_measures.mse(y_test, results.predict(x_test[column]))
-			rs.write("\n training MSE: " + str(training_mse))
-			rs.write("\n testing MSE: " + str(testing_mse))
+			training_mse = eval_measures.mse(y_train, pd.DataFrame(results.predict(x_train[column])))
+			testing_mse = eval_measures.mse(y_test, pd.DataFrame(results.predict(x_test[column])))
+			rs.write("\n training MSE: " + str(training_mse[0]))
+			rs.write("\n testing MSE: " + str(testing_mse[0]))
 		# print(results.summary(), "\n\n")
 	return
 
@@ -442,10 +442,10 @@ def overall_multiregression(x_train, x_test, y_train, y_test):
 	with open(f"results/multiregression-result-summary.txt", "w+") as rs:
 		rs.write(results.summary().as_text())
 		# TODO: Something is messed up here
-		training_mse = eval_measures.mse(y_train, results.predict(x_train))
-		testing_mse = eval_measures.mse(y_test, results.predict(x_test))
-		rs.write("\n training MSE: " + str(training_mse))
-		rs.write("\n testing MSE: " + str(testing_mse))
+		training_mse = eval_measures.mse(y_train, pd.DataFrame(results.predict(x_train)))
+		testing_mse = eval_measures.mse(y_test, pd.DataFrame(results.predict(x_test)))
+		rs.write("\n training MSE: " + str(training_mse[0]))
+		rs.write("\n testing MSE: " + str(testing_mse[0]))
 	# print(results.summary())
 	return
 
