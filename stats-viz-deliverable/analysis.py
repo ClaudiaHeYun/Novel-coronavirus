@@ -404,13 +404,13 @@ def overall_single_regressions(x_train, x_test, y_train, y_test):
 	for column in x_train.columns:
 		x = x_train[column]
 		plt.scatter(x, y_train)
-		plt.ylabel("Days to infection")
-		plt.xlabel(column)
+		plt.ylabel("Days to first infection")
+		plt.xlabel(column.replace("-", " ").title())
 		plt.savefig(f"results/single-regressions/{column}-scatter.png")
 		plt.clf()
 
 		plt.hist(x_train[column])
-		plt.ylabel(column)
+		plt.ylabel(column.replace("-", " ").title())
 		plt.savefig(f"results/single-regressions/{column}-histogram.png")
 		plt.clf()
 
@@ -441,6 +441,7 @@ def overall_multiregression(x_train, x_test, y_train, y_test):
 	# print(f"Multiregression summary:")
 	with open(f"results/multiregression-result-summary.txt", "w+") as rs:
 		rs.write(results.summary().as_text())
+		# TODO: Something is messed up here
 		training_mse = eval_measures.mse(y_train, results.predict(x_train))
 		testing_mse = eval_measures.mse(y_test, results.predict(x_test))
 		rs.write("\n training MSE: " + str(training_mse))
@@ -538,7 +539,7 @@ if __name__ == "__main__":
 	# You can add countries to either x or y to make it easy to see which rows correspond to which country if you need
 	countries = [row[0] for row in population_data]
 
-	columns = ["population", "density", "routes"]
+	columns = ["population", "density", "number-of-incoming-routes"]
 	X = pd.DataFrame(zip(pop_data, density_data, subset_route_data), columns=columns)
 	y_columns = ["days_to_first_infection"]
 	y = pd.DataFrame(zip(days_to_first_infection), columns=y_columns)
