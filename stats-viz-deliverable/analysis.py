@@ -474,40 +474,6 @@ def overall_multiregression(x_train, x_test, y_train, y_test):
 	return
 
 
-def create_population_and_routes_dataframe(routes, route_countries, population_data, pop_countries):
-	route_countries_to_remove  = route_countries -  pop_countries 
-	new_routes = []
-	for row in routes:
-		curr_country = row[0]
-		flag = True
-		for c_to_remove in route_countries_to_remove:
-			if curr_country == c_to_remove:
-				flag = False
-				break
-		if flag:
-			new_routes.append(row)
-
-	pop_countries_to_remove  = pop_countries - route_countries
-	new_population = []
-	for row in population_data:
-		curr_country = row[0]
-		flag = True
-		for c_to_remove in pop_countries_to_remove:
-			if curr_country == c_to_remove:
-				flag = False
-				break
-		if flag:
-			new_population.append(row)
-
-	rdf = pd.DataFrame(new_routes)
-	rdf.columns =['country', 'routes']
-	
-	pdf = pd.DataFrame(new_population)
-	pdf.columns =['country', 'population', 'density']
-	
-	
-	result = pd.concat([rdf, pdf['population'], pdf['density']], axis=1, sort=False)
-	return result
 
 if __name__ == "__main__":
 	pp = pprint.PrettyPrinter()
@@ -531,8 +497,6 @@ if __name__ == "__main__":
 	# print("In routes but not populations:")
 	# pp.pprint(route_countries - pop_countries)
 	
-	df = create_population_and_routes_dataframe(routes, route_countries, population_data, pop_countries)
-	print(df)
 	# TODO: Would like to turn it all into a single df but can't
 	# do this until routes and population line up
 	# x_df["routes"] = routes
