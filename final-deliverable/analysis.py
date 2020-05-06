@@ -520,9 +520,10 @@ if __name__ == "__main__":
 	just_route_counts = [row[2] for row in hot_routes if row[0] in intersect_routes_cases]
 	# print(just_route_counts[:10])
 	just_days_to_infection = [row[2] for row in y_time_series if row[0] in intersect_routes_cases]
-	h_x_train, h_x_test, y_t_train, y_t_test = train_test_split(
-		pd.DataFrame(just_route_counts, columns=["hot-routes"]), just_days_to_infection)
-	overall_single_regressions(h_x_train, h_x_test, y_t_train, y_t_test)
+	hot_X = pd.DataFrame(just_route_counts, columns=["hot-routes"])
+	y = pd.DataFrame(just_days_to_infection, columns=["just days to infection"])	
+	h_x_train, h_x_test, y_t_train, y_t_test = train_test_split(hot_X, y, test_size=.2)
+	r = overall_single_regressions(h_x_train, h_x_test, y_t_train, y_t_test)
 
 	# Restrict y to only rows where the country appears in the intersection
 	days_to_first_infection = [row[2] for row in days_to_first_infection if row[0] in intersect_countries_of_all_vars]
@@ -552,7 +553,7 @@ if __name__ == "__main__":
 	y_columns = ["days_to_first_infection"]
 	y = pd.DataFrame(zip(days_to_first_infection), columns=y_columns)
 
-	sample_size = 50
+	sample_size = 1
 	simple_results = {}
 	for category in columns:
 		simple_results[category] = []	
