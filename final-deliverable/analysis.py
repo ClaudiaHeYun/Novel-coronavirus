@@ -452,7 +452,7 @@ def overall_single_regressions(x_train, x_test, y_train, y_test):
 			testing_mse = eval_measures.mse(y_test, pd.DataFrame(results.predict(x_test_with_const)))
 			rs.write("\n training MSE: " + str(training_mse[0]))
 			rs.write("\n testing MSE: " + str(testing_mse[0]))
-			results_map[column] = (results.rsquared, training_mse, testing_mse)
+			results_map[column] = (results.rsquared, training_mse[0], testing_mse[0])
 	return results_map
 
 
@@ -475,7 +475,7 @@ def overall_multiregression(x_train, x_test, y_train, y_test):
 		rs.write("\n training MSE: " + str(training_mse[0]))
 		rs.write("\n testing MSE: " + str(testing_mse[0]))
 	# print(results.summary())
-	return (results.rsquared, training_mse, testing_mse)
+	return (results.rsquared, training_mse[0], testing_mse[0])
 
 
 if __name__ == "__main__":
@@ -521,9 +521,12 @@ if __name__ == "__main__":
 	# print(just_route_counts[:10])
 	just_days_to_infection = [row[2] for row in y_time_series if row[0] in intersect_routes_cases]
 	hot_X = pd.DataFrame(just_route_counts, columns=["hot-routes"])
-	y = pd.DataFrame(just_days_to_infection, columns=["just days to infection"])	
-	h_x_train, h_x_test, y_t_train, y_t_test = train_test_split(hot_X, y, test_size=.2)
-	r = overall_single_regressions(h_x_train, h_x_test, y_t_train, y_t_test)
+	hot_y = pd.DataFrame(just_days_to_infection, columns=["just days to infection"])	
+	# h_x_train, h_x_test, y_t_train, y_t_test = train_test_split(hot_X, hot_y, test_size=.2)
+	# r = overall_single_regressions(h_x_train, h_x_test, y_t_train, y_t_test)
+	# print(len(hot_X))
+	# print(len(hot_y))
+	# print(r)
 
 	# Restrict y to only rows where the country appears in the intersection
 	days_to_first_infection = [row[2] for row in days_to_first_infection if row[0] in intersect_countries_of_all_vars]
@@ -553,14 +556,20 @@ if __name__ == "__main__":
 	y_columns = ["days_to_first_infection"]
 	y = pd.DataFrame(zip(days_to_first_infection), columns=y_columns)
 
-	sample_size = 1
+	sample_size = 50
 	simple_results = {}
 	for category in columns:
 		simple_results[category] = []	
 	multi_results = []
 	metrics = ["R-Squared", "Training MSE", "Testing MSE"]
+	hot_results = []
 	for i in range(sample_size):
-		
+
+		# hot routes data
+		h_x_train, h_x_test, y_t_train, y_t_test = train_test_split(hot_X, hot_y, test_size=.2)
+		hot_sample = overall_single_regressions(h_x_train, h_x_test, y_t_train, y_t_test)
+		hot_results.append(hot_sample["hot-routes"])
+
 		# Split data into x_train, x_test, y_train, y_test
 		X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.2)
 
@@ -576,15 +585,22 @@ if __name__ == "__main__":
 	# calculate means
 	multi_results = pd.DataFrame(multi_results, columns = metrics)
 	average_multi = multi_results.mean(axis = 0)
+
 	for category in columns:
 		simple_results[category] = pd.DataFrame(simple_results[category], columns = metrics)
 		simple_results[category] = simple_results[category].mean(axis = 0)
+
+	hot_results = pd.DataFrame(hot_results, columns = metrics)
+	average_hot = hot_results.mean(axis = 0)
 
 	print("average multi results:")
 	print(average_multi)
 	for category in columns:
 		print(f"average simple {category} results:")
 		print(simple_results[category])
+
+	print("average simple hot routes results:")
+	print(average_hot)
 
 	# # Run an overall regression on viral pressure
 	# overall_viral_pressure_analysis(db_path, y_time_series)
