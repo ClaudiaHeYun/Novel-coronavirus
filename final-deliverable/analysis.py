@@ -426,6 +426,7 @@ def overall_single_regressions(x_train, x_test, y_train, y_test):
 	Run a regression over the whole timeline for each variable.
 	x and y should be Pandas dataframes.
 	"""
+	results_map = {}
 	for column in x_train.columns:
 		x = x_train[column]
 		plt.scatter(x, y_train)
@@ -451,8 +452,8 @@ def overall_single_regressions(x_train, x_test, y_train, y_test):
 			testing_mse = eval_measures.mse(y_test, pd.DataFrame(results.predict(x_test_with_const)))
 			rs.write("\n training MSE: " + str(training_mse[0]))
 			rs.write("\n testing MSE: " + str(testing_mse[0]))
-		# print(results.summary(), "\n\n")
-	return
+			results_map[column] = (results.rsquared, training_mse, testing_mse)
+	return results_map
 
 
 def overall_multiregression(x_train, x_test, y_train, y_test):
@@ -474,7 +475,7 @@ def overall_multiregression(x_train, x_test, y_train, y_test):
 		rs.write("\n training MSE: " + str(training_mse[0]))
 		rs.write("\n testing MSE: " + str(testing_mse[0]))
 	# print(results.summary())
-	return
+	return (results.rsquared, training_mse, testing_mse)
 
 
 if __name__ == "__main__":
@@ -551,14 +552,38 @@ if __name__ == "__main__":
 	y_columns = ["days_to_first_infection"]
 	y = pd.DataFrame(zip(days_to_first_infection), columns=y_columns)
 
-	# Split data into x_train, x_test, y_train, y_test
-	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.2)
+	sample_size = 50
+	simple_results = {}
+	for category in columns:
+		simple_results[category] = []	
+	multi_results = []
+	metrics = ["R-Squared", "Training MSE", "Testing MSE"]
+	for i in range(sample_size):
+		
+		# Split data into x_train, x_test, y_train, y_test
+		X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.2)
 
-	# Run overall regressions on each individual variable
-	overall_single_regressions(X_train, X_test, y_train, y_test)
+		# Run overall regressions on each individual variable
+		single_results = overall_single_regressions(X_train, X_test, y_train, y_test)
+		for category in columns:
+			simple_results[category].append(single_results[category])
 
-	# Run a multi-regression on all variables
-	overall_multiregression(X_train, X_test, y_train, y_test)
+		# Run a multi-regression on all variables
+		overall_results = overall_multiregression(X_train, X_test, y_train, y_test)
+		multi_results.append(overall_results)
+
+	# calculate means
+	multi_results = pd.DataFrame(multi_results, columns = metrics)
+	average_multi = multi_results.mean(axis = 0)
+	for category in columns:
+		simple_results[category] = pd.DataFrame(simple_results[category], columns = metrics)
+		simple_results[category] = simple_results[category].mean(axis = 0)
+
+	print("average multi results:")
+	print(average_multi)
+	for category in columns:
+		print(f"average simple {category} results:")
+		print(simple_results[category])
 
 	# # Run an overall regression on viral pressure
 	# overall_viral_pressure_analysis(db_path, y_time_series)
@@ -567,3 +592,4 @@ if __name__ == "__main__":
 	# daily_analysis(db_path)
 
 	exit(0)
+
