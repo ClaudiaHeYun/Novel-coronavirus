@@ -440,13 +440,15 @@ def overall_single_regressions(x_train, x_test, y_train, y_test):
 		plt.clf()
 
 		# Use StatsModels to create the Linear Model and Output R-squared
-		model = sm.OLS(y_train, x_train[column])
+		x_with_const = sm.add_constant(x.copy())
+		model = sm.OLS(y_train, x_with_const)
 		results = model.fit()
 		# print(f"{column} regression summary:")
 		with open(f"results/single-regressions/{column}-result-summary.txt", "w+") as rs:
 			rs.write(results.summary().as_text())
-			training_mse = eval_measures.mse(y_train, pd.DataFrame(results.predict(x_train[column])))
-			testing_mse = eval_measures.mse(y_test, pd.DataFrame(results.predict(x_test[column])))
+			training_mse = eval_measures.mse(y_train, pd.DataFrame(results.predict(x_with_const)))
+			x_test_with_const = sm.add_constant(x_test[column])
+			testing_mse = eval_measures.mse(y_test, pd.DataFrame(results.predict(x_test_with_const)))
 			rs.write("\n training MSE: " + str(training_mse[0]))
 			rs.write("\n testing MSE: " + str(testing_mse[0]))
 		# print(results.summary(), "\n\n")
@@ -519,7 +521,7 @@ if __name__ == "__main__":
 	just_days_to_infection = [row[2] for row in y_time_series if row[0] in intersect_routes_cases]
 	h_x_train, h_x_test, y_t_train, y_t_test = train_test_split(
 		pd.DataFrame(just_route_counts, columns=["hot-routes"]), just_days_to_infection)
-	overall_single_regressions(h_x_train, h_x_train, y_t_train, y_t_test)
+	overall_single_regressions(h_x_train, h_x_test, y_t_train, y_t_test)
 
 	# Restrict y to only rows where the country appears in the intersection
 	days_to_first_infection = [row[2] for row in days_to_first_infection if row[0] in intersect_countries_of_all_vars]
@@ -540,6 +542,10 @@ if __name__ == "__main__":
 	# You can add countries to either x or y to make it easy to see which rows correspond to which country if you need
 	countries = [row[0] for row in population_data]
 
+	# Add baseline that always guesses zero days to infection
+	# 104 is manually pulled as the span from Jan 22 to May 5
+	# single_baseline = [104 for _ in range(len(subset_population_data))]
+
 	columns = ["population", "density", "number-of-incoming-routes"]
 	X = pd.DataFrame(zip(pop_data, density_data, subset_route_data), columns=columns)
 	y_columns = ["days_to_first_infection"]
@@ -555,7 +561,7 @@ if __name__ == "__main__":
 	overall_multiregression(X_train, X_test, y_train, y_test)
 
 	# # Run an overall regression on viral pressure
-	overall_viral_pressure_analysis(db_path, y_time_series)
+	# overall_viral_pressure_analysis(db_path, y_time_series)
 
 	# Run a day-by-day analsysis on viral pressure
 	# daily_analysis(db_path)

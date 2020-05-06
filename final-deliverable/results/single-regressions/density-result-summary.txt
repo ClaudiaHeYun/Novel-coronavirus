@@ -1,26 +1,27 @@
-                                   OLS Regression Results                                   
-============================================================================================
-Dep. Variable:     days_to_first_infection   R-squared (uncentered):                   0.191
-Model:                                 OLS   Adj. R-squared (uncentered):              0.185
-Method:                      Least Squares   F-statistic:                              32.25
-Date:                     Tue, 05 May 2020   Prob (F-statistic):                    7.80e-08
-Time:                             14:59:53   Log-Likelihood:                         -708.49
-No. Observations:                      138   AIC:                                      1419.
-Df Residuals:                          137   BIC:                                      1422.
-Df Model:                                1                                                  
-Covariance Type:                 nonrobust                                                  
+                               OLS Regression Results                              
+===================================================================================
+Dep. Variable:     days_to_first_infection   R-squared:                       0.000
+Model:                                 OLS   Adj. R-squared:                 -0.007
+Method:                      Least Squares   F-statistic:                  0.002522
+Date:                     Wed, 06 May 2020   Prob (F-statistic):              0.960
+Time:                             15:53:52   Log-Likelihood:                -608.14
+No. Observations:                      138   AIC:                             1220.
+Df Residuals:                          136   BIC:                             1226.
+Df Model:                                1                                         
+Covariance Type:                 nonrobust                                         
 ==============================================================================
                  coef    std err          t      P>|t|      [0.025      0.975]
 ------------------------------------------------------------------------------
-density        0.0647      0.011      5.679      0.000       0.042       0.087
+const         41.7532      1.758     23.750      0.000      38.277      45.230
+density        0.0001      0.002      0.050      0.960      -0.004       0.005
 ==============================================================================
-Omnibus:                       44.732   Durbin-Watson:                   0.860
-Prob(Omnibus):                  0.000   Jarque-Bera (JB):               99.132
-Skew:                          -1.365   Prob(JB):                     2.98e-22
-Kurtosis:                       6.128   Cond. No.                         1.00
+Omnibus:                        6.987   Durbin-Watson:                   1.912
+Prob(Omnibus):                  0.030   Jarque-Bera (JB):                6.603
+Skew:                          -0.475   Prob(JB):                       0.0368
+Kurtosis:                       3.497   Cond. No.                         806.
 ==============================================================================
 
 Warnings:
 [1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
- training MSE: 1685.9067567986913
- testing MSE: 9112.874240711632
+ training MSE: 393.7900605336623
+ testing MSE: 298.78823648922446
