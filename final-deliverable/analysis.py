@@ -389,6 +389,31 @@ def get_routes(database_path):
 		return [row for row in conn.cursor().execute(route_query)]
 
 
+def get_hot_routes(db_path):
+	"""
+	Takes a database path and produces a list of tuples containing a country,
+	a date, and the number of incoming flight routes from countries with confirmed
+	cases
+	"""
+	hot_route_query = """
+	select
+		a2.country as arrival_country,
+		date,
+		count(NULLIF(confirmed, 0)) as hot_incoming_routes
+	from routes
+	inner join airports as a1
+	on departure_code = a1.iata
+	inner join airports as a2
+	on arrival_code = a2.iata
+	inner join cases
+	on cases.country = a1.country -- Source country's cases
+	where a1.country != a2.country
+	group by a2.country, date
+	"""
+	with sqlite3.connect(db_path) as conn:
+		return [row for row in conn.cursor().execute(hot_route_query)]
+
+
 def get_population_data(database_path):
 	"""Takes a path and produces a list of countries and their populations"""
 	population_query = """select name, population, density from countries"""
@@ -465,6 +490,8 @@ if __name__ == "__main__":
 
 	# Y is a time series for all countries for all days
 	y_time_series = process_y(get_case_data(db_path))
+
+
 	# Restrict y to days from days zero
 	# TODO: Here, again, we've got trouble with aligning countries unless we do better clean when making db
 	days_to_first_infection = [row for row in y_time_series if row[1] == "2020-01-22"]
@@ -483,6 +510,16 @@ if __name__ == "__main__":
 	# then only include these countries in the multi-regression
 	# 169 countries make it into this intersections, which should be enough
 	intersect_countries_of_all_vars = route_countries & pop_countries & case_countries
+
+	# Hot routes analysis
+	intersect_routes_cases = route_countries & case_countries
+	hot_routes = get_hot_routes(db_path)
+	just_route_counts = [row[2] for row in hot_routes if row[0] in intersect_routes_cases]
+	# print(just_route_counts[:10])
+	just_days_to_infection = [row[2] for row in y_time_series if row[0] in intersect_routes_cases]
+	h_x_train, h_x_test, y_t_train, y_t_test = train_test_split(
+		pd.DataFrame(just_route_counts, columns=["hot-routes"]), just_days_to_infection)
+	overall_single_regressions(h_x_train, h_x_train, y_t_train, y_t_test)
 
 	# Restrict y to only rows where the country appears in the intersection
 	days_to_first_infection = [row[2] for row in days_to_first_infection if row[0] in intersect_countries_of_all_vars]
@@ -522,8 +559,5 @@ if __name__ == "__main__":
 
 	# Run a day-by-day analsysis on viral pressure
 	# daily_analysis(db_path)
-
-	# TODO: Stretch analysis would be countin the number of "hot" routes on a daily basis based
-	# on whether those routes are coming from infected countries
 
 	exit(0)

@@ -1,0 +1,26 @@
+                                 OLS Regression Results                                
+=======================================================================================
+Dep. Variable:                      y   R-squared (uncentered):                   0.217
+Model:                            OLS   Adj. R-squared (uncentered):              0.217
+Method:                 Least Squares   F-statistic:                              3748.
+Date:                Tue, 05 May 2020   Prob (F-statistic):                        0.00
+Time:                        22:02:22   Log-Likelihood:                         -66270.
+No. Observations:               13494   AIC:                                  1.325e+05
+Df Residuals:                   13493   BIC:                                  1.325e+05
+Df Model:                           1                                                  
+Covariance Type:            nonrobust                                                  
+==============================================================================
+                 coef    std err          t      P>|t|      [0.025      0.975]
+------------------------------------------------------------------------------
+hot-routes    -0.0490      0.001    -61.222      0.000      -0.051      -0.047
+==============================================================================
+Omnibus:                      557.477   Durbin-Watson:                   1.994
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):              241.705
+Skew:                          -0.052   Prob(JB):                     3.27e-53
+Kurtosis:                       2.353   Cond. No.                         1.00
+==============================================================================
+
+Warnings:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+ training MSE: 2588.8690259362365
+ testing MSE: 2043.892157633397
