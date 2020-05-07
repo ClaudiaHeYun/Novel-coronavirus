@@ -297,10 +297,10 @@ def overall_viral_pressure_analysis(file_path, y):
 	x_sorted_pressure = [x[2] for x in x_sorted]
 	y_sorted_days = [y[2] for y in y_sorted]
 
-	plt.scatter(x_sorted_pressure, y_sorted_days)
+	plt.scatter(x_sorted_pressure, y_sorted_days, alpha=.5)
 	plt.ylabel("Days to infection")
 	plt.xlabel("Viral pressure")
-	plt.savefig("results/full_scatter.png")
+	plt.savefig("results/full_scatter.png", dpi=600)
 	plt.clf()
 
 	# Print out all countries for each date where viral pressure is not 0
@@ -313,7 +313,7 @@ def overall_viral_pressure_analysis(file_path, y):
 
 	plt.hist([x[2] for x in nonzero_x])
 	plt.ylabel("Viral Pressure")
-	plt.savefig("results/viral_pressure.png")
+	plt.savefig("results/viral_pressure.png", dpi=600)
 
 	# Use train test split to split data into x_train, x_test, y_train, y_test #
 	# (x_train, x_test, y_train, y_test) = train_test_split(x_sorted_pressure, y_sorted_days, p)
@@ -354,7 +354,7 @@ def daily_analysis(file_path):
 	plt.plot_date(dates, mse)	
 	plt.ylabel("MSE")
 	plt.xlabel("Date")
-	plt.savefig("results/MSE_daily_scatter.png")
+	plt.savefig("results/MSE_daily_scatter.png", dpi=600)
 	plt.clf()
 
 	ax = plt.gca()
@@ -363,7 +363,7 @@ def daily_analysis(file_path):
 	plt.plot_date(dates, rsquared)
 	plt.ylabel("R-Squared")
 	plt.xlabel("Date")
-	plt.savefig("results/R_Squared_daily_scatter.png")
+	plt.savefig("results/R_Squared_daily_scatter.png", dpi=600)
 	plt.clf()
 
 
@@ -429,21 +429,26 @@ def overall_single_regressions(x_train, x_test, y_train, y_test):
 	results_map = {}
 	for column in x_train.columns:
 		x = x_train[column]
-		plt.scatter(x, y_train)
-		plt.ylabel("Days to first infection")
-		plt.xlabel(column.replace("-", " ").title())
-		plt.savefig(f"results/single-regressions/{column}-scatter.png")
-		plt.clf()
-
-		plt.hist(x_train[column])
-		plt.ylabel(column.replace("-", " ").title())
-		plt.savefig(f"results/single-regressions/{column}-histogram.png")
-		plt.clf()
 
 		# Use StatsModels to create the Linear Model and Output R-squared
 		x_with_const = sm.add_constant(x)
 		model = sm.OLS(y_train, x_with_const)
 		results = model.fit()
+		b, m = results.params
+
+		plt.scatter(x, y_train, alpha=.5)
+		plt.plot(x, m*x + b)
+		plt.ylabel("Days to first infection")
+		plt.xlabel(column.replace("-", " ").title())
+
+		plt.savefig(f"results/single-regressions/{column}-scatter.png", dpi=600)
+		plt.clf()
+
+		plt.hist(x_train[column])
+		plt.ylabel(column.replace("-", " ").title())
+		plt.savefig(f"results/single-regressions/{column}-histogram.png", dpi=600)
+		plt.clf()
+
 		# print(f"{column} regression summary:")
 		with open(f"results/single-regressions/{column}-result-summary.txt", "w+") as rs:
 			rs.write(results.summary().as_text())

@@ -2,26 +2,26 @@
 ===================================================================================
 Dep. Variable:     days_to_first_infection   R-squared:                       0.000
 Model:                                 OLS   Adj. R-squared:                 -0.007
-Method:                      Least Squares   F-statistic:                  0.005543
-Date:                     Thu, 07 May 2020   Prob (F-statistic):              0.941
-Time:                             13:53:20   Log-Likelihood:                -605.79
-No. Observations:                      138   AIC:                             1216.
-Df Residuals:                          136   BIC:                             1221.
+Method:                      Least Squares   F-statistic:                 0.0008335
+Date:                     Thu, 07 May 2020   Prob (F-statistic):              0.977
+Time:                             18:08:56   Log-Likelihood:                -607.99
+No. Observations:                      138   AIC:                             1220.
+Df Residuals:                          136   BIC:                             1226.
 Df Model:                                1                                         
 Covariance Type:                 nonrobust                                         
 ==============================================================================
                  coef    std err          t      P>|t|      [0.025      0.975]
 ------------------------------------------------------------------------------
-const         40.6892      1.745     23.315      0.000      37.238      44.140
-density       -0.0002      0.002     -0.074      0.941      -0.004       0.004
+const         39.8264      1.769     22.509      0.000      36.327      43.325
+density     6.343e-05      0.002      0.029      0.977      -0.004       0.004
 ==============================================================================
-Omnibus:                        6.602   Durbin-Watson:                   1.985
-Prob(Omnibus):                  0.037   Jarque-Bera (JB):                6.314
-Skew:                          -0.430   Prob(JB):                       0.0426
-Kurtosis:                       3.599   Cond. No.                         840.
+Omnibus:                        5.690   Durbin-Watson:                   1.626
+Prob(Omnibus):                  0.058   Jarque-Bera (JB):                5.200
+Skew:                          -0.419   Prob(JB):                       0.0743
+Kurtosis:                       3.449   Cond. No.                         838.
 ==============================================================================
 
 Warnings:
 [1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
- training MSE: 380.58814203170743
- testing MSE: 350.01119636715185
+ training MSE: 392.8852206522755
+ testing MSE: 308.7625376886281

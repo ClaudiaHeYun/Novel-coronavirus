@@ -1,31 +1,31 @@
                                OLS Regression Results                              
 ===================================================================================
-Dep. Variable:     days_to_first_infection   R-squared:                       0.313
-Model:                                 OLS   Adj. R-squared:                  0.298
-Method:                      Least Squares   F-statistic:                     20.36
-Date:                     Thu, 07 May 2020   Prob (F-statistic):           6.24e-11
-Time:                             13:53:20   Log-Likelihood:                -579.88
-No. Observations:                      138   AIC:                             1168.
-Df Residuals:                          134   BIC:                             1179.
+Dep. Variable:     days_to_first_infection   R-squared:                       0.357
+Model:                                 OLS   Adj. R-squared:                  0.343
+Method:                      Least Squares   F-statistic:                     24.81
+Date:                     Thu, 07 May 2020   Prob (F-statistic):           7.88e-13
+Time:                             18:08:59   Log-Likelihood:                -577.51
+No. Observations:                      138   AIC:                             1163.
+Df Residuals:                          134   BIC:                             1175.
 Df Model:                                3                                         
 Covariance Type:                 nonrobust                                         
 =============================================================================================
                                 coef    std err          t      P>|t|      [0.025      0.975]
 ---------------------------------------------------------------------------------------------
-const                        46.6628      1.646     28.357      0.000      43.408      49.917
-population                -1.444e-08   8.91e-09     -1.621      0.107   -3.21e-08    3.18e-09
-density                      -0.0005      0.002     -0.286      0.775      -0.004       0.003
-number-of-incoming-routes    -0.0283      0.004     -6.612      0.000      -0.037      -0.020
+const                        46.0150      1.600     28.768      0.000      42.852      49.179
+population                -1.741e-08   8.64e-09     -2.015      0.046   -3.45e-08    -3.2e-10
+density                      -0.0004      0.002     -0.210      0.834      -0.004       0.003
+number-of-incoming-routes    -0.0255      0.003     -7.390      0.000      -0.032      -0.019
 ==============================================================================
-Omnibus:                        9.907   Durbin-Watson:                   1.969
-Prob(Omnibus):                  0.007   Jarque-Bera (JB):               17.657
-Skew:                          -0.277   Prob(JB):                     0.000147
-Kurtosis:                       4.662   Cond. No.                     2.05e+08
+Omnibus:                       10.694   Durbin-Watson:                   1.718
+Prob(Omnibus):                  0.005   Jarque-Bera (JB):               19.853
+Skew:                          -0.295   Prob(JB):                     4.89e-05
+Kurtosis:                       4.762   Cond. No.                     2.02e+08
 ==============================================================================
 
 Warnings:
 [1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
-[2] The condition number is large, 2.05e+08. This might indicate that there are
+[2] The condition number is large, 2.02e+08. This might indicate that there are
 strong multicollinearity or other numerical problems.
- training MSE: 261.44488600869875
- testing MSE: 177.07907407943807
+ training MSE: 252.59685736544253
+ testing MSE: 214.2942697589895
