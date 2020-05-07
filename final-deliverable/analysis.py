@@ -441,7 +441,7 @@ def overall_single_regressions(x_train, x_test, y_train, y_test):
 		plt.clf()
 
 		# Use StatsModels to create the Linear Model and Output R-squared
-		x_with_const = sm.add_constant(x.copy())
+		x_with_const = sm.add_constant(x)
 		model = sm.OLS(y_train, x_with_const)
 		results = model.fit()
 		# print(f"{column} regression summary:")
@@ -517,9 +517,9 @@ if __name__ == "__main__":
 	# Hot routes analysis
 	intersect_routes_cases = route_countries & case_countries
 	hot_routes = get_hot_routes(db_path)
-	just_route_counts = [row[2] for row in hot_routes if row[0] in intersect_routes_cases]
+	just_route_counts = [row[2] for row in hot_routes if row[0] in intersect_routes_cases and row[1] == "2020-01-22"]
 	# print(just_route_counts[:10])
-	just_days_to_infection = [row[2] for row in y_time_series if row[0] in intersect_routes_cases]
+	just_days_to_infection = [row[2] for row in days_to_first_infection if row[0] in intersect_routes_cases]
 	hot_X = pd.DataFrame(just_route_counts, columns=["hot-routes"])
 	hot_y = pd.DataFrame(just_days_to_infection, columns=["just days to infection"])	
 	# h_x_train, h_x_test, y_t_train, y_t_test = train_test_split(hot_X, hot_y, test_size=.2)
